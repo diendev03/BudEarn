@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragment.Fragment_Home">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        android:orientation="vertical"
+        android:padding="20dp"
+        tools:ignore="UselessParent">
+
+        <TextView
+            style="@style/Headline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="10dp"
+            android:text="Thêm giờ làm mới"
+            tools:ignore="HardcodedText" />
+
+        <Spinner
+            android:id="@+id/sp_company"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_square"
+            android:gravity="center" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="9"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:id="@+id/tv_home_date"
+                style="@style/TextNormal"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="3"
+                android:background="@drawable/selector_square"
+                android:clickable="true"
+                android:focusable="false"
+                android:gravity="center"
+                android:hint="@string/format_date"
+                android:textColorHint="@color/navy" />
+
+            <TextView
+                android:id="@+id/tv_home_timestart"
+                style="@style/TextNormal"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="3"
+                android:background="@drawable/selector_square"
+                android:clickable="true"
+                android:focusable="false"
+                android:gravity="center"
+                android:hint="@string/format_time"
+                android:textColorHint="@color/navy" />
+
+            <TextView
+                android:id="@+id/tv_home_timefinish"
+                style="@style/TextNormal"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_weight="3"
+                android:background="@drawable/selector_square"
+                android:clickable="true"
+                android:focusable="false"
+                android:gravity="center"
+                android:hint="@string/format_time"
+                android:textColorHint="@color/navy" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_home_addWorkTime"
+            style="@style/ButtonNormal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/selector_button_normal"
+            android:text="Xác nhận thêm"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:id="@+id/btn_home_workList"
+            style="@style/ButtonNormal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/selector_button_normal"
+            android:text="Xem danh sách nơi làm việc"
+            tools:ignore="HardcodedText" />
+        <Button
+            android:id="@+id/btn_home_salary"
+            style="@style/ButtonNormal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/selector_button_normal"
+            android:text="Tính tiền lương tháng này"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+</FrameLayout>
