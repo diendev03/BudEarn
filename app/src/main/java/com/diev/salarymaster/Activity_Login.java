@@ -4,40 +4,41 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.diev.salarymaster.Fragment.Fragment_Manager;
 
 public class Activity_Login extends AppCompatActivity {
-Button btnffff;
+    EditText edtemail, edtpassword;
+    Button btnlogin, btnsignup;
+    TextView tvforgot;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
         setControl();
         setEvent();
     }
 
     private void setEvent() {
-        btnffff.setOnClickListener(view -> {
-            Intent intent = new Intent(Activity_Login.this, Fragment_Manager.class);
-            startActivity(intent);
-            finish();
+        btnsignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Activity_Login.this, Activity_Signup.class);
+                startActivity(intent);
+            }
         });
     }
 
     private void setControl() {
-        btnffff=findViewById(R.id.btnffff);
+        edtemail = findViewById(R.id.edt_login_email);
+        edtpassword = findViewById(R.id.edt_login_password);
+        btnlogin = findViewById(R.id.btn_login_login);
+        btnsignup = findViewById(R.id.btn_login_signup);
+        tvforgot = findViewById(R.id.tv_login_forgetpassword);
     }
 }

@@ -109,7 +109,7 @@
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/selector_button_normal"
-            android:text="Tính tiền lương tháng này"
+            android:text="Xem tổng tiền lương tháng này"
             tools:ignore="HardcodedText" />
     </LinearLayout>
 
