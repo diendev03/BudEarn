@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activity_Login">
+    tools:context=".Activity.Activity_Login">
 
 
     <LinearLayout
@@ -73,16 +73,22 @@
                 android:textStyle="italic" />
 
         </LinearLayout>
-
-
-        <Button
-            android:id="@+id/btn_login_signup"
-            style="@style/ButtonNormal"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@drawable/selector_button_normal"
-            android:text="Tạo tài khoản" />
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:orientation="vertical"
+    android:gravity="bottom">
+    <Button
+        android:id="@+id/btn_login_signup"
+        style="@style/ButtonNormal"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/selector_button_normal"
+        android:text="Tạo tài khoản"
+        android:layout_marginBottom="40dp"
+        tools:ignore="HardcodedText" />
+</LinearLayout>
 
     </LinearLayout>
 
@@ -102,6 +108,7 @@
         android:layout_gravity="center"
         android:background="@null"
         android:indeterminate="true"
-        android:indeterminateTint="@color/accent"
+        android:indeterminateDrawable="@drawable/progress_bar"
+        android:indeterminateTint="@color/primary"
         android:visibility="gone" />
 </FrameLayout>

@@ -13,16 +13,13 @@
         android:theme="@style/Theme.SalaryMaster"
         tools:targetApi="31">
         <activity
-            android:name=".Activity_Signup"
-            android:exported="false" />
-        <activity
-            android:name=".Activity_Menu"
+            android:name=".Activity.Activity_Signup"
             android:exported="false" />
         <activity
             android:name=".Fragment.Fragment_Manager"
             android:exported="false" />
         <activity
-            android:name=".Activity_Login"
+            android:name=".Activity.Activity_Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

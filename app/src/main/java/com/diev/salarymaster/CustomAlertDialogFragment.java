@@ -5,14 +5,20 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
+import org.jetbrains.annotations.Nullable;
+
 public class CustomAlertDialogFragment extends DialogFragment {
 
     private String message;
-
     public CustomAlertDialogFragment( String message) {
         this.message = message;
     }
