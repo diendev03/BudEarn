@@ -2,6 +2,7 @@ package com.diev.salarymaster.Fragment;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,10 +10,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.diev.salarymaster.Activity.Activity_Company_Management;
 import com.diev.salarymaster.R;
 
 import java.text.SimpleDateFormat;
@@ -65,7 +68,7 @@ public class Fragment_Home extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
+Button btn_companyList;
     private TextView tvDate, tvTimeStart, tvTimeFinish;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,6 +85,7 @@ public class Fragment_Home extends Fragment {
         tvDate = view.findViewById(R.id.tv_home_date);
         tvTimeStart = view.findViewById(R.id.tv_home_timestart);
         tvTimeFinish = view.findViewById(R.id.tv_home_timefinish);
+        btn_companyList=view.findViewById(R.id.btn_home_workList);
     }
 
     private void setEvent() {
@@ -103,6 +107,13 @@ public class Fragment_Home extends Fragment {
             @Override
             public void onClick(View v) {
                 showTimePickerDialog(tvTimeFinish);
+            }
+        });
+        btn_companyList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(requireContext(), Activity_Company_Management.class);
+                startActivity(intent);
             }
         });
     }

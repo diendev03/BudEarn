@@ -1,0 +1,109 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.Activity_Add_Company">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/ib_company_back"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="start|center_vertical"
+                android:background="@null"
+                android:scaleType="centerCrop"
+                android:src="@drawable/back"
+                tools:ignore="ContentDescription" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/ib_company_new"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="end|center_vertical"
+                android:background="@null"
+                android:scaleType="centerCrop"
+                android:src="@drawable/upload"
+                tools:ignore="ContentDescription" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_add_company_pic"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:background="@drawable/selector_circle"
+            android:clipToOutline="true"
+            android:contentDescription="Thêm ảnh cute cho nơi làm việc"
+
+            android:scaleType="centerCrop"
+            android:src="@drawable/default_pic"
+            tools:ignore="HardcodedText" />
+
+        <EditText
+            android:id="@+id/edt_add_company_name"
+            style="@style/Widget.AppCompat.EditText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_square"
+            android:hint="Tên nơi làm việc"
+            android:inputType="textAutoComplete"
+            android:paddingStart="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/navy"
+            tools:ignore="Autofill,HardcodedText,RtlSymmetry" />
+
+        <EditText
+            android:id="@+id/edt_add_company_salary"
+            style="@style/Widget.AppCompat.EditText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/selector_square"
+            android:hint="Lương/h"
+            android:inputType="numberDecimal"
+            android:paddingStart="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/navy"
+            tools:ignore="Autofill,HardcodedText,RtlSymmetry" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/viewBlocking_add_company"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@null"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/progressBar_add_company"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:background="@null"
+        android:indeterminate="true"
+        android:indeterminateDrawable="@drawable/progress_bar"
+        android:indeterminateTint="@color/primary"
+        android:visibility="gone" />
+</FrameLayout>

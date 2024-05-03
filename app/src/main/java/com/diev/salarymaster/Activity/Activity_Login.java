@@ -14,7 +14,7 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.diev.salarymaster.CustomAlertDialogFragment;
+import com.diev.salarymaster.InformationAlert;
 import com.diev.salarymaster.ForgotPasswordDialogFragment;
 import com.diev.salarymaster.Fragment.Fragment_Manager;
 import com.diev.salarymaster.R;
@@ -68,6 +68,8 @@ public class Activity_Login extends AppCompatActivity {
             public void onClick(View view) {
                 ForgotPasswordDialogFragment dialogFragment = new ForgotPasswordDialogFragment();
                 dialogFragment.show(getSupportFragmentManager(), "forgot_password_dialog");
+                InformationAlert alert = new InformationAlert("Hãy kiểm tra email nhóe!");
+                alert.show(getSupportFragmentManager(), "custom_dialog_fragment");
             }
         });
     }
@@ -100,7 +102,7 @@ public class Activity_Login extends AppCompatActivity {
                 finish();
             } else {
                 // Đăng nhập thất bại
-                CustomAlertDialogFragment dialogFragment = new CustomAlertDialogFragment("Email hoặc mật khẩu không đúng!");
+                InformationAlert dialogFragment = new InformationAlert("Email hoặc mật khẩu không đúng!");
                 dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
             }
             viewBlocking.setVisibility(View.GONE);

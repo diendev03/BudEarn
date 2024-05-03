@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.diev.salarymaster.CustomAlertDialogFragment;
+import com.diev.salarymaster.InformationAlert;
 import com.diev.salarymaster.Model.User;
 import com.diev.salarymaster.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -81,12 +81,12 @@ public class Activity_Signup extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     String uuid = firebaseAuth.getCurrentUser().getUid();
                     if (createAccount(newUser(uuid, email))) {
-                        CustomAlertDialogFragment dialogFragment = new CustomAlertDialogFragment("Tạo tài khoản thành công");
+                        InformationAlert dialogFragment = new InformationAlert("Tạo tài khoản thành công");
                         dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
                         Refesh();
                     }
                 } else {
-                    CustomAlertDialogFragment dialogFragment = new CustomAlertDialogFragment("Lỗi kết nối!");
+                    InformationAlert dialogFragment = new InformationAlert("Lỗi kết nối!");
                     dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
                 }
             }
@@ -124,7 +124,7 @@ public class Activity_Signup extends AppCompatActivity {
     private boolean ValidateData(String email, String password) {
         // Kiểm tra không chuỗi nào được rỗng
         if (email.isEmpty() || password.isEmpty()) {
-            CustomAlertDialogFragment dialogFragment = new CustomAlertDialogFragment("Vui lòng điền đầy đủ thông tin!");
+            InformationAlert dialogFragment = new InformationAlert("Vui lòng điền đầy đủ thông tin!");
             dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
             return false;
         }
@@ -132,14 +132,14 @@ public class Activity_Signup extends AppCompatActivity {
         // Kiểm tra định dạng email
         String emailPattern = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}";
         if (!email.matches(emailPattern)) {
-            CustomAlertDialogFragment dialogFragment = new CustomAlertDialogFragment("Vui lòng kiểm tra lại email chính xác!");
+            InformationAlert dialogFragment = new InformationAlert("Vui lòng kiểm tra lại email chính xác!");
             dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
             return false;
         }
 
         // Kiểm tra password có ít nhất 6 kí tự và ít nhất 1 số
         if (password.length() < 6 || !password.matches(".*\\d.*")) {
-            CustomAlertDialogFragment dialogFragment = new CustomAlertDialogFragment("Mật khẩu phải có ít nhất 6 kí tự và chứa ít nhất 1 số!");
+            InformationAlert dialogFragment = new InformationAlert("Mật khẩu phải có ít nhất 6 kí tự và chứa ít nhất 1 số!");
             dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
             return false;
         }
@@ -148,7 +148,7 @@ public class Activity_Signup extends AppCompatActivity {
         String phone = edt_phone.getText().toString().trim();
         String phonePattern = "(\\+84|0)\\d{9,10}";
         if (!phone.matches(phonePattern)) {
-            CustomAlertDialogFragment dialogFragment = new CustomAlertDialogFragment("Vui lòng kiểm tra lại số điện thoại");
+            InformationAlert dialogFragment = new InformationAlert("Vui lòng kiểm tra lại số điện thoại");
             dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
             return false;
         }
