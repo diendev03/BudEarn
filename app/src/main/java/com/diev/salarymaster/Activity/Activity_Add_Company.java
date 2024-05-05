@@ -1,5 +1,6 @@
 package com.diev.salarymaster.Activity;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,15 +12,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.diev.salarymaster.ConfirmationAlert;
-import com.diev.salarymaster.InformationAlert;
-import com.diev.salarymaster.ImagePicker;
-import com.diev.salarymaster.ImageUploader;
+import com.diev.salarymaster.Custom.ConfirmationAlert;
+import com.diev.salarymaster.Custom.InformationAlert;
+import com.diev.salarymaster.Custom.ImagePicker;
+import com.diev.salarymaster.Custom.ImageUploader;
 import com.diev.salarymaster.Model.Company;
 import com.diev.salarymaster.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -45,14 +45,18 @@ public class Activity_Add_Company extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_company);
+        // Lấy userId từ SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PRE, MODE_PRIVATE);
         userId = sharedPreferences.getString(uuid, "");
+        // Gán các control trong layout cho biến
         setControl();
+        // Thiết lập các sự kiện
         setEvent();
         // Khởi tạo ImageUploader
         imageUploader = new ImageUploader("Company");
     }
 
+    // Gán các control trong layout cho biến
     private void setControl() {
         ib_back = findViewById(R.id.ib_company_back);
         ib_save = findViewById(R.id.ib_company_new);
@@ -63,8 +67,11 @@ public class Activity_Add_Company extends AppCompatActivity {
         progressBar=findViewById(R.id.progressBar_add_company);
     }
 
+    // Thiết lập các sự kiện
     private void setEvent() {
+        // Sự kiện khi nhấn nút back
         ib_back.setOnClickListener(view -> finish());
+        // Sự kiện khi nhấn chọn ảnh đại diện
         iv_avatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,10 +86,13 @@ public class Activity_Add_Company extends AppCompatActivity {
                 });
             }
         });
+        // Sự kiện khi nhấn nút lưu
         ib_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (image != null) {
+                // Kiểm tra dữ liệu trước khi lưu
+                if (validate()) {
+                    // Hiển thị viewBlocking và progressBar
                     viewBlocking.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.VISIBLE);
                     // Nếu đã chọn ảnh, tiến hành tải lên và tạo đối tượng Company
@@ -101,6 +111,7 @@ public class Activity_Add_Company extends AppCompatActivity {
                             new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
+                                    // Ẩn viewBlocking và progressBar
                                     viewBlocking.setVisibility(View.GONE);
                                     progressBar.setVisibility(View.GONE);
                                     // Xử lý khi tải lên ảnh thất bại
@@ -108,15 +119,27 @@ public class Activity_Add_Company extends AppCompatActivity {
                                     dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
                                 }
                             });
-                } else {
-                    // Nếu chưa chọn ảnh, thông báo cho người dùng
-                    InformationAlert dialogFragment = new InformationAlert("Vui lòng chọn ảnh");
-                    dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
                 }
             }
         });
     }
 
+    // Hàm kiểm tra dữ liệu trước khi lưu
+    private  boolean validate(){
+        if (edt_name.getText().toString().trim().isEmpty() || edt_salary.getText().toString().trim().isEmpty()){
+            InformationAlert dialogFragment = new InformationAlert("Ít nhất bạn phải cung cấp tên và lương theo giờ của nơi làm việc!");
+            dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
+            return false;
+        }
+        if (image==null){
+            InformationAlert dialogFragment = new InformationAlert("Vui lòng thêm 1 ảnh bất kì!");
+            dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
+            return false;
+        }
+        return true;
+    }
+
+    // Hàm tạo đối tượng Company và lưu vào Firebase
     private void CreateCompanyOnFirebase(Company company){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference companyRef = database.getReference("Company").child(userId); // Đường dẫn đến nút "Company/userId/"
@@ -129,12 +152,13 @@ public class Activity_Add_Company extends AppCompatActivity {
                         @Override
                         public void onSuccess(Void aVoid) {
                             // Xử lý khi lưu thông tin công ty thành công
-
+                            // Ẩn viewBlocking và progressBar
                             viewBlocking.setVisibility(View.GONE);
                             progressBar.setVisibility(View.GONE);
+                            // Refresh các trường dữ liệu
                             Refesh();
+                            // Hiển thị thông báo và xác nhận quay lại màn hình trước
                             String message="Thêm thành công\nBạn có muốn trở lại màn hình trước đó không?";
-                            // Tạo một phiên bản mới của ConfirmationAlert và truyền vào thông tin cần thiết
                             ConfirmationAlert confirmationAlert = new ConfirmationAlert(message, "Không", "Có",
                                     new DialogInterface.OnClickListener() {
                                         @Override
@@ -142,8 +166,6 @@ public class Activity_Add_Company extends AppCompatActivity {
                                             finish();
                                         }
                                     });
-
-                            // Hiển thị Dialog bằng cách sử dụng FragmentManager
                             confirmationAlert.show(getSupportFragmentManager(), "confirmation_alert_dialog");
                         }
                         private void Refesh() {
@@ -154,13 +176,15 @@ public class Activity_Add_Company extends AppCompatActivity {
                         }
                     })
                     .addOnFailureListener(e -> {
-                        // Xử lý khi có lỗi xảy ra
+                        // Ẩn viewBlocking và progressBar
                         viewBlocking.setVisibility(View.GONE);
                         progressBar.setVisibility(View.GONE);
+                        // Xử lý khi có lỗi xảy ra
                         InformationAlert dialogFragment = new InformationAlert("Lỗi! Vui lòng thử lại sau.");
                         dialogFragment.show(getSupportFragmentManager(), "custom_dialog_fragment");
                     });
         } else {
+            // Ẩn viewBlocking và progressBar
             viewBlocking.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             InformationAlert dialogFragment = new InformationAlert("Vui lòng kiểm tra kết nối.");
@@ -168,6 +192,7 @@ public class Activity_Add_Company extends AppCompatActivity {
         }
     }
 
+    // Xử lý kết quả khi chọn hoặc chụp ảnh từ ImagePicker
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -182,7 +207,7 @@ public class Activity_Add_Company extends AppCompatActivity {
         });
     }
 
-
+    // Hàm tạo đối tượng Company từ dữ liệu nhập vào
     private Company CreateCompany(String imageUrl) {
         String today = setCurrentDate();
         Company company = new Company();
@@ -194,6 +219,8 @@ public class Activity_Add_Company extends AppCompatActivity {
         return company;
     }
 
+    // Hàm lấy ngày hiện tại và định dạng thành chuỗi
+    @SuppressLint("DefaultLocale")
     private String setCurrentDate() {
         // Lấy ngày tháng năm hiện tại
         Calendar calendar = Calendar.getInstance();

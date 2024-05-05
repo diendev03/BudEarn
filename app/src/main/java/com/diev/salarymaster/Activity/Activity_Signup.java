@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.diev.salarymaster.InformationAlert;
+import com.diev.salarymaster.Custom.InformationAlert;
 import com.diev.salarymaster.Model.User;
 import com.diev.salarymaster.R;
 import com.google.android.gms.tasks.OnCompleteListener;

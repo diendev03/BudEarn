@@ -1,4 +1,4 @@
-package com.diev.salarymaster;
+package com.diev.salarymaster.Custom;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
@@ -9,6 +9,8 @@ import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
+
+import com.diev.salarymaster.R;
 
 public class InformationAlert extends DialogFragment {
 

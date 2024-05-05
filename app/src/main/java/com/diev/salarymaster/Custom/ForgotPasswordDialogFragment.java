@@ -1,4 +1,4 @@
-package com.diev.salarymaster;
+package com.diev.salarymaster.Custom;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.diev.salarymaster.Activity.Activity_Login;
+import com.diev.salarymaster.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
