@@ -10,6 +10,7 @@
         android:layout_height="match_parent"
         android:background="@color/background"
         android:gravity="center"
+        android:layout_gravity="center"
         android:orientation="vertical"
         android:paddingHorizontal="10dp">
 
@@ -31,9 +32,9 @@
                 style="@style/Widget.AppCompat.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:hint="Email"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/selector_square"
-                android:hint="Email"
                 android:inputType="textEmailAddress"
                 android:paddingStart="10dp"
                 android:textColor="@color/black"
@@ -45,12 +46,14 @@
                 style="@style/Widget.AppCompat.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:background="@drawable/selector_square"
+                android:layout_marginBottom="10dp"
                 android:hint="Mật khẩu"
+                android:background="@drawable/selector_square"
                 android:inputType="textPassword"
                 android:paddingStart="10dp"
+                android:textColor="@color/black"
                 android:textColorHint="@color/navy"
-                tools:ignore="Autofill,HardcodedText,RtlSymmetry" />
+                tools:ignore="Autofill,HardcodedText,RtlSymmetry"  />
 
             <Button
                 android:id="@+id/btn_login_login"
@@ -75,14 +78,6 @@
                 tools:ignore="HardcodedText" />
 
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="bottom"
-            android:orientation="vertical">
-
             <Button
                 android:id="@+id/btn_login_signup"
                 style="@style/ButtonNormal"
@@ -92,7 +87,6 @@
                 android:background="@drawable/selector_button_normal"
                 android:text="Tạo tài khoản"
                 tools:ignore="HardcodedText" />
-        </LinearLayout>
 
     </LinearLayout>
 

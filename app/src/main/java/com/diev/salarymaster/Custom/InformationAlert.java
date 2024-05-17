@@ -25,7 +25,7 @@ public class InformationAlert extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Thông báo");
         builder.setMessage(message);
-        Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.back);
+        Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.notification);
 
         builder.setIcon(icon);
 

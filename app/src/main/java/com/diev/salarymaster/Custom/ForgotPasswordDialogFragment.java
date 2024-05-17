@@ -24,7 +24,6 @@ public class ForgotPasswordDialogFragment extends DialogFragment {
     private EditText edtEmail;
     private boolean isResetSuccessful = false;
 
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -50,25 +49,27 @@ public class ForgotPasswordDialogFragment extends DialogFragment {
         return builder.create();
     }
 
-
     // Gửi mã xác nhận đổi mật khẩu
     private void sendCodeResetPassword(String email) {
         FirebaseAuth.getInstance().sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(getActivity(), "Mã đã được gửi thành công đến địa chỉ email của bạn.", Toast.LENGTH_SHORT).show();
-                    // Gửi thành công
-                    dismiss();
+                if (getActivity() != null) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getActivity(), "Mã đã được gửi thành công đến địa chỉ email của bạn.", Toast.LENGTH_SHORT).show();
+                        // Gửi thành công
+                        dismiss();
+                    } else {
+                        Toast.makeText(getActivity(), "Không thể gửi mã đến địa chỉ email của bạn. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show();
+                        // Gửi không thành công
+                        dismiss();
+                    }
                 } else {
-                    Toast.makeText(getActivity(), "Không thể gửi mã đến địa chỉ email của bạn. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show();
-                    // Gửi không thành công
-                    dismiss();
+                    // Log lỗi hoặc xử lý khi getActivity() là null
                 }
             }
         });
     }
-
 
     // Thông báo thành công đến Activity_Login
     private void notifySuccess() {

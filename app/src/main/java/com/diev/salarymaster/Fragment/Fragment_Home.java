@@ -1,24 +1,43 @@
 package com.diev.salarymaster.Fragment;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.diev.salarymaster.Activity.Activity_Company_Management;
+import com.diev.salarymaster.Adapter.SpinnerCompanyAdapter;
+import com.diev.salarymaster.Custom.ConfirmationAlert;
+import com.diev.salarymaster.Custom.InformationAlert;
+import com.diev.salarymaster.Model.Company;
+import com.diev.salarymaster.Model.TimeWork;
 import com.diev.salarymaster.R;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -68,16 +87,33 @@ public class Fragment_Home extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-Button btn_companyList;
+
+    public static String SHARED_PRE = "shared_pre";
+    public static String uuid = "uuid";
+    private String userId;
+    private Company selectedCompany;
+    private Button btn_companyList, btn_addWorkTime;
     private TextView tvDate, tvTimeStart, tvTimeFinish;
+    private Spinner sp_company;
+    private ProgressBar progressBar_spinner;
+
+
+    ArrayList<Company> companies = new ArrayList<>();
+    private SpinnerCompanyAdapter companyAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         setControl(view);
+
+        // Lấy userId từ SharedPreferences
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(SHARED_PRE, MODE_PRIVATE); // Thay đổi để sử dụng requireContext()
+        userId = sharedPreferences.getString(uuid, "");
+
         setEvent();
         setCurrentDate();
+        getCompanies(userId);
         return view;
     }
 
@@ -86,6 +122,12 @@ Button btn_companyList;
         tvTimeStart = view.findViewById(R.id.tv_home_timestart);
         tvTimeFinish = view.findViewById(R.id.tv_home_timefinish);
         btn_companyList=view.findViewById(R.id.btn_home_workList);
+        btn_addWorkTime = view.findViewById(R.id.btn_home_addWorkTime);
+        sp_company = view.findViewById(R.id.sp_home_company);
+        progressBar_spinner = view.findViewById(R.id.progressBar_home_spinner);
+        // Khởi tạo adapter cho Spinner
+        companyAdapter = new SpinnerCompanyAdapter(requireContext(), companies); // Sử dụng requireContext()
+        sp_company.setAdapter(companyAdapter); // Thiết lập adapter cho Spinner
     }
 
     private void setEvent() {
@@ -114,6 +156,111 @@ Button btn_companyList;
             public void onClick(View view) {
                 Intent intent=new Intent(requireContext(), Activity_Company_Management.class);
                 startActivity(intent);
+            }
+        });
+        btn_addWorkTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createTimeWork(addTimeWork(userId));
+            }
+        });
+
+        sp_company.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedCompany = (Company) parent.getItemAtPosition(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Xử lý khi không có gì được chọn
+            }
+        });
+
+    }
+    private void createTimeWork(TimeWork timeWork){
+        FirebaseDatabase database=FirebaseDatabase.getInstance();
+        DatabaseReference tw=database.getReference("TimeWork").child(userId);
+        DatabaseReference newTimeWork=tw.push();
+        String timeWorkId=newTimeWork.getKey();
+        if (timeWorkId!=null){
+            timeWork.setId(timeWorkId);
+            newTimeWork.setValue(timeWork).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    InformationAlert alert = new InformationAlert("Thêm giờ làm thành công!");
+                    alert.show(getParentFragmentManager(), "custom_dialog_fragment"); // Sử dụng getParentFragmentManager()
+                }
+            });
+        }
+    }
+    private TimeWork addTimeWork(String userId) {
+        String date, start, finish;
+        date = tvDate.getText().toString();
+        start = tvTimeStart.getText().toString();
+        finish = tvTimeFinish.getText().toString();
+
+        TimeWork timeWork = new TimeWork();
+        timeWork.setUuid(userId);
+        timeWork.setCompany(selectedCompany.getId());
+        timeWork.setDate(date);
+        timeWork.setStart(start);
+        timeWork.setFinish(finish);
+
+        // Chuyển đổi chuỗi thời gian thành giây
+        long startTimeInSeconds = timeStringToSeconds(start);
+        long finishTimeInSeconds = timeStringToSeconds(finish);
+
+        // Tính toán tổng số giây
+        long totalTimeInSeconds = finishTimeInSeconds - startTimeInSeconds;
+
+        // Chuyển đổi tổng số giây thành giờ với một chữ số thập phân
+        double totalTimeInHours = (double) totalTimeInSeconds / 3600.0;
+
+        // Làm tròn tổng số giờ xuống một chữ số thập phân
+        double roundedTotalTime = Math.floor(totalTimeInHours * 10) / 10;
+
+        // Gán tổng số giờ đã làm tròn cho total
+        timeWork.setTotal(roundedTotalTime);
+
+        return timeWork;
+    }
+
+    // Phương thức chuyển đổi chuỗi thời gian sang giây
+    private long timeStringToSeconds(String time) {
+        String[] parts = time.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        return hours * 3600 + minutes * 60;
+    }
+
+
+    private void getCompanies(String userId) {
+        sp_company.setVisibility(View.VISIBLE);
+        sp_company.setVisibility(View.GONE);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Company").child(userId);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                companies.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Company company = dataSnapshot.getValue(Company.class);
+                    if (company != null) {
+                        companies.add(company);
+                    }
+                }
+                companyAdapter.notifyDataSetChanged(); // Thông báo cho adapter rằng dữ liệu đã thay đổi
+                sp_company.setVisibility(View.VISIBLE);
+                progressBar_spinner.setVisibility(View.GONE);
+                if (companies.size() == 0) {
+                    InformationAlert alert = new InformationAlert("Bạn cần thêm nơi làm việc vào danh sách!!!");
+                    alert.show(getParentFragmentManager(), "custom_dialog_fragment"); // Sử dụng getParentFragmentManager()
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Xử lý lỗi nếu cần
             }
         });
     }

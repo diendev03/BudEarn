@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,9 +35,9 @@ ProgressBar progressBar;
         // Lấy userId từ SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PRE, MODE_PRIVATE);
         userId = sharedPreferences.getString(uuid, "");
-        adapter_company=new Adapter_Company(this,userId);
         setControl();
         setEvent();
+        adapter_company=new Adapter_Company(this,userId,viewBlocking,progressBar);
     }
 
     private void setEvent() {
@@ -54,6 +55,6 @@ ProgressBar progressBar;
     private void setControl() {
         btn_new=findViewById(R.id.ib_company_new);
         ib_back=findViewById(R.id.ib_company_back);
-rcv_listCompany=findViewById(R.id.rcv_listcompany);
+        rcv_listCompany=findViewById(R.id.rcv_listcompany);
     }
 }

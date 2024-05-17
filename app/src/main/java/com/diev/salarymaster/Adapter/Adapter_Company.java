@@ -27,10 +27,15 @@ public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.Compan
     private ArrayList<Company> companies = new ArrayList<>();
     private Context context;
     private String userId;
+    View viewBlocking;
+    ProgressBar progressBar;
 
-    public Adapter_Company(Context context, String userId) {
+
+    public Adapter_Company(Context context, String userId, View viewBlocking, ProgressBar progressBar) {
         this.context = context;
         this.userId = userId;
+        this.viewBlocking=viewBlocking;
+        this.progressBar=progressBar;
         khoitao();
     }
 

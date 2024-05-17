@@ -8,7 +8,7 @@
     <!--    </item>-->
     <item android:id="@android:id/progress">
         <rotate
-            android:drawable="@drawable/loading"
+            android:drawable="@drawable/loading1"
             android:fromDegrees="0"
             android:toDegrees="360" />
     </item>

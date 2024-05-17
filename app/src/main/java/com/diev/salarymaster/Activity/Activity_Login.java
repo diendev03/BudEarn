@@ -68,7 +68,7 @@ public class Activity_Login extends AppCompatActivity {
             public void onClick(View view) {
                 ForgotPasswordDialogFragment dialogFragment = new ForgotPasswordDialogFragment();
                 dialogFragment.show(getSupportFragmentManager(), "forgot_password_dialog");
-                InformationAlert alert = new InformationAlert("Hãy kiểm tra email nhóe!");
+                InformationAlert alert = new InformationAlert("Hãy kiểm tra email sau khi nhập thông tin nhóe!");
                 alert.show(getSupportFragmentManager(), "custom_dialog_fragment");
             }
         });

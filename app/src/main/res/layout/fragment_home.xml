@@ -21,13 +21,30 @@
             android:text="Thêm giờ làm mới"
             tools:ignore="HardcodedText" />
 
-        <Spinner
-            android:id="@+id/sp_company"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/selector_square"
-            android:gravity="center" />
+            android:layout_height="40dp">
+
+            <ProgressBar
+                android:id="@+id/progressBar_home_spinner"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:background="@null"
+                android:indeterminate="true"
+                android:indeterminateDrawable="@drawable/progress_bar"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+
+            <Spinner
+                android:id="@+id/sp_home_company"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginBottom="10dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/selector_square"
+                android:gravity="center" />
+        </RelativeLayout>
 
 
         <LinearLayout
