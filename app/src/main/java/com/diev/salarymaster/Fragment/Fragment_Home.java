@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -199,6 +200,7 @@ public class Fragment_Home extends Fragment {
         date = tvDate.getText().toString();
         start = tvTimeStart.getText().toString();
         finish = tvTimeFinish.getText().toString();
+        Double wage=Double.parseDouble(selectedCompany.getSalary());
 
         TimeWork timeWork = new TimeWork();
         timeWork.setUuid(userId);
@@ -206,6 +208,7 @@ public class Fragment_Home extends Fragment {
         timeWork.setDate(date);
         timeWork.setStart(start);
         timeWork.setFinish(finish);
+        timeWork.setWage(wage);
 
         // Chuyển đổi chuỗi thời gian thành giây
         long startTimeInSeconds = timeStringToSeconds(start);
