@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.diev.salarymaster.Model.Company;
 import com.diev.salarymaster.Model.TimeWork;
 import com.diev.salarymaster.R;
 import com.github.mikephil.charting.charts.BarChart;
@@ -68,20 +69,21 @@ public class Fragment_Statictis extends Fragment {
     private PieChart piechart;
     private BarChart barchart;
     private ArrayList<TimeWork> dataTimeWork = new ArrayList<>();
+    private ArrayList<Company> dataCompany = new ArrayList<>();
 
     Spinner monthSpinner;
 
-    Spinner yearSpinner;
+    Spinner yearSpinner_piechart;
+    Spinner yearSpinner_barchart;
     ProgressBar progressBar_load_piechart;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_statictis, container, false);
-
         SharedPreferences sharedPreferences = view.getContext().getSharedPreferences(SHARED_PRE, MODE_PRIVATE);
         userId = sharedPreferences.getString(uuid, "");
-
         setControl(view);
+        getDataCompany();
         setEvent();
 
         return view;
@@ -90,12 +92,13 @@ public class Fragment_Statictis extends Fragment {
     private void setControl(View view) {
         piechart = view.findViewById(R.id.piechart);
         barchart = view.findViewById(R.id.barchart);
-        yearSpinner = view.findViewById(R.id.yearSpinner);
+        yearSpinner_piechart = view.findViewById(R.id.yearSpinner);
+        yearSpinner_barchart = view.findViewById(R.id.yearSpinner_barchart);
         monthSpinner = view.findViewById(R.id.monthSpinner);
         progressBar_load_piechart = view.findViewById(R.id.progressBar_load_piechart);
 
         // PieChart setup
-        piechart.setUsePercentValues(true);
+        piechart.setUsePercentValues(false);
         piechart.getDescription().setEnabled(false);
         piechart.setExtraOffsets(5, 10, 5, 5);
         piechart.setDragDecelerationFrictionCoef(0.95f);
@@ -109,59 +112,50 @@ public class Fragment_Statictis extends Fragment {
     }
 
     private void setEvent() {
-        // Sample data for BarChart
-        ArrayList<BarEntry> barEntries = new ArrayList<>();
-        barEntries.add(new BarEntry(0, 50f)); // Math
-        barEntries.add(new BarEntry(1, 70f)); // Physics
-        barEntries.add(new BarEntry(2, 60f)); // Chemistry
-        // Add more data as needed...
-
-        BarDataSet barDataSet = new BarDataSet(barEntries, "Subjects");
-        barDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
-
-        BarData barData = new BarData(barDataSet);
-        barchart.setData(barData);
-        barchart.getDescription().setEnabled(false);
-        barchart.animateX(1000);
-        barchart.invalidate();
-
-
         setDataDate();
 
-        getDataTimework(getCurrentMonthYear());
         monthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                // Lấy giá trị được chọn từ Spinner tháng
+                // Get selected month and year
                 String selectedMonth = adapterView.getItemAtPosition(position).toString();
-
-                // Lấy giá trị được chọn từ Spinner năm
-                String selectedYear = yearSpinner.getSelectedItem().toString();
-                getDataTimework(selectedMonth + "/" + selectedYear);
+                String selectedYear = yearSpinner_piechart.getSelectedItem().toString();
+                setDataPieChart(selectedMonth + "/" + selectedYear);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                // Xử lý khi không có gì được chọn
+                // Handle case where nothing is selected
             }
         });
-        yearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+        yearSpinner_piechart.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                // Lấy giá trị được chọn từ Spinner tháng
-                String selectedYear= adapterView.getItemAtPosition(position).toString();
-                // Lấy giá trị được chọn từ Spinner năm
+                // Get selected month and year
+                String selectedYear = adapterView.getItemAtPosition(position).toString();
                 String selectedMonth = monthSpinner.getSelectedItem().toString();
-
-                getDataTimework(selectedMonth + "/" + selectedYear);
+                setDataPieChart(selectedMonth + "/" + selectedYear);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                // Xử lý khi không có gì được chọn
+                // Handle case where nothing is selected
             }
         });
+        yearSpinner_barchart.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                // Get selected month and year
+                String selectedYear = adapterView.getItemAtPosition(position).toString();
+                setDataBarChart(selectedYear);
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                // Handle case where nothing is selected
+            }
+        });
     }
 
     private String getCurrentMonthYear() {
@@ -205,15 +199,16 @@ public class Fragment_Statictis extends Fragment {
 
         ArrayAdapter<String> yearAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, yearList);
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        yearSpinner.setAdapter(yearAdapter);
+        yearSpinner_piechart.setAdapter(yearAdapter);
+        yearSpinner_barchart.setAdapter(yearAdapter);
 
         // Chọn năm hiện tại
-        yearSpinner.setSelection(yearList.indexOf(String.valueOf(currentYear)));
+        yearSpinner_piechart.setSelection(yearList.indexOf(String.valueOf(currentYear)));
+        yearSpinner_barchart.setSelection(yearList.indexOf(String.valueOf(currentYear)));
     }
 
 
     private void getDataTimework(String date) {
-
         progressBar_load_piechart.setVisibility(View.VISIBLE);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("TimeWork").child(userId);
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -227,6 +222,7 @@ public class Fragment_Statictis extends Fragment {
                     }
                 }
                 setDataPieChart(date);
+                setDataBarChart(date.split("/")[1]); // Pass only the year for the bar chart
                 progressBar_load_piechart.setVisibility(View.GONE);
             }
 
@@ -245,15 +241,17 @@ public class Fragment_Statictis extends Fragment {
             try {
                 String date = timeWork.getDate();
                 if (date != null) {
-                    // Kiểm tra xem ngày có nằm trong tháng được chỉ định không
+                    // Check if the date falls within the specified month
                     SimpleDateFormat monthYearFormat = new SimpleDateFormat("MM/yyyy");
                     String monthYearOfWork = monthYearFormat.format(sdf.parse(date));
                     if (monthYear.equals(monthYearOfWork)) {
                         String company = timeWork.getCompany();
-                        double total = timeWork.getTotal();
-                        double wage = timeWork.getWage();
+                        double totalHours = timeWork.getTotal();
+                        double wagePerHour = timeWork.getWage();
                         double currentTotalWage = companyWageMap.getOrDefault(company, 0.0);
-                        companyWageMap.put(company, currentTotalWage + (total * wage));
+                        // Calculate total wage and add to the current total
+                        double calculatedWage = totalHours * wagePerHour;
+                        companyWageMap.put(company, currentTotalWage + calculatedWage);
                     }
                 }
             } catch (Exception e) {
@@ -264,13 +262,86 @@ public class Fragment_Statictis extends Fragment {
         return companyWageMap;
     }
 
+    public static Map<Integer, Double> filterByMonth(List<TimeWork> timeWorks, String year) {
+        Map<Integer, Double> monthWageMap = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        // Initialize map with all months set to 0
+        for (int month = 1; month <= 12; month++) {
+            monthWageMap.put(month, 0.0);
+        }
+
+        for (TimeWork timeWork : timeWorks) {
+            try {
+                String date = timeWork.getDate();
+                if (date != null) {
+                    // Kiểm tra xem ngày có nằm trong năm được chỉ định không
+                    SimpleDateFormat monthYearFormat = new SimpleDateFormat("MM/yyyy");
+                    String monthYearOfWork = monthYearFormat.format(sdf.parse(date));
+                    if (monthYearOfWork.endsWith(year)) {
+                        int month = Integer.parseInt(monthYearOfWork.substring(0, 2)); // Get the month part as an integer
+                        double total = timeWork.getTotal();
+                        double wage = timeWork.getWage();
+                        double currentTotalWage = monthWageMap.getOrDefault(month, 0.0);
+                        monthWageMap.put(month, currentTotalWage + (total * wage));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return monthWageMap;
+    }
+
+
+    private void getDataCompany() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Company").child(userId);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Company company = dataSnapshot.getValue(Company.class);
+                    if (company != null) {
+                        dataCompany.add(company);
+                    }
+                }
+                getDataTimework(getCurrentMonthYear());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle error
+            }
+        });
+    }
+
+    private void setDataBarChart(String year) {
+        ArrayList<BarEntry> barEntries = new ArrayList<>();
+        Map<Integer, Double> result = filterByMonth(dataTimeWork, year);
+
+        // Convert result to BarEntries
+        for (Map.Entry<Integer, Double> entry : result.entrySet()) {
+            int month = entry.getKey();
+            float value = entry.getValue().floatValue();
+            barEntries.add(new BarEntry(month - 1, value)); // BarEntry month is zero-based
+        }
+
+        BarDataSet barDataSet = new BarDataSet(barEntries, "Total Wage per Month");
+        barDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+
+        BarData barData = new BarData(barDataSet);
+        barchart.setData(barData);
+        barchart.getDescription().setEnabled(false);
+        barchart.animateX(1000);
+        barchart.invalidate();
+    }
 
     private void setDataPieChart(String monthYear) {
-
         Map<String, Double> result = filterAndCalculate(dataTimeWork, monthYear);
 
         if (result.isEmpty()) {
-            // Nếu không có dữ liệu, hiển thị thông báo "No Data"
+            // If there's no data, show "No Data"
             ArrayList<PieEntry> noDataEntry = new ArrayList<>();
             noDataEntry.add(new PieEntry(1f, "No Data"));
 
@@ -283,15 +354,20 @@ public class Fragment_Statictis extends Fragment {
             piechart.animateY(1000);
             piechart.invalidate();
         } else {
-            // Nếu có dữ liệu, hiển thị biểu đồ tròn bình thường
+            // If there's data, show the pie chart
             ArrayList<PieEntry> pieEntries = new ArrayList<>();
             for (Map.Entry<String, Double> entry : result.entrySet()) {
-                String company = entry.getKey();
+                String companyName = "";
+                for (Company company : dataCompany) {
+                    if (company.getId().equals(entry.getKey())) {
+                        companyName = company.getName();
+                    }
+                }
                 double totalWage = entry.getValue();
-                pieEntries.add(new PieEntry((float) totalWage, company)); // Use actual company names
+                pieEntries.add(new PieEntry((float) totalWage, companyName)); // Use actual company names
             }
 
-            PieDataSet pieDataSet = new PieDataSet(pieEntries, "Company Wages");
+            PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
             pieDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
             PieData pieData = new PieData(pieDataSet);
             piechart.setData(pieData);

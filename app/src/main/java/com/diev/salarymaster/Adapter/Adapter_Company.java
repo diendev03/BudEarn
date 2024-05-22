@@ -23,6 +23,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+// Adapter_Company.java
 public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.CompanyViewHolder> {
     private ArrayList<Company> companies = new ArrayList<>();
     private Context context;
@@ -30,16 +31,15 @@ public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.Compan
     View viewBlocking;
     ProgressBar progressBar;
 
-
-    public Adapter_Company(Context context, String userId, View viewBlocking, ProgressBar progressBar) {
+    public Adapter_Company(Context context, String userId, ProgressBar progressBar) {
         this.context = context;
         this.userId = userId;
-        this.viewBlocking=viewBlocking;
-        this.progressBar=progressBar;
+        this.progressBar = progressBar;
         khoitao();
     }
 
     private void khoitao() {
+        progressBar.setVisibility(View.VISIBLE);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Company").child(userId);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -52,14 +52,15 @@ public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.Compan
                     }
                 }
                 notifyDataSetChanged();
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
+
     @NonNull
     @Override
     public Adapter_Company.CompanyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -73,23 +74,16 @@ public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.Compan
         holder.tv_name.setText(company.getName());
         if (company.getAvatar() != null && !company.getAvatar().isEmpty()) {
             String imageUrl = company.getAvatar();
-
-            // Hiển thị ProgressBar
             holder.progressBar.setVisibility(View.VISIBLE);
-
-            // Sử dụng Picasso để tải ảnh
             Picasso.get().load(imageUrl).into(holder.iv_avatar, new Callback() {
                 @Override
                 public void onSuccess() {
-                    // Ẩn ProgressBar khi tải thành công
                     holder.progressBar.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    // Ẩn ProgressBar và xử lý lỗi
                     holder.progressBar.setVisibility(View.GONE);
-                    // Bạn có thể đặt một ảnh mặc định nếu tải ảnh thất bại
                     holder.iv_avatar.setImageResource(R.drawable.default_pic);
                 }
             });

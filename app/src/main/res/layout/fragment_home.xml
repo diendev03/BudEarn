@@ -103,7 +103,7 @@
         <Button
             android:id="@+id/btn_home_addWorkTime"
             style="@style/ButtonNormal"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/selector_button_normal"
