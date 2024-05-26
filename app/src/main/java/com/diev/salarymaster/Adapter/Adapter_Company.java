@@ -84,7 +84,7 @@ public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.Compan
                 @Override
                 public void onError(Exception e) {
                     holder.progressBar.setVisibility(View.GONE);
-                    holder.iv_avatar.setImageResource(R.drawable.default_pic);
+                    holder.iv_avatar.setImageResource(R.drawable.business);
                 }
             });
         }

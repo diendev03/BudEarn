@@ -171,7 +171,7 @@ public class Activity_Add_Company extends AppCompatActivity {
                         private void Refesh() {
                             edt_name.setText("");
                             edt_salary.setText("");
-                            iv_avatar.setImageResource(R.drawable.default_pic);
+                            iv_avatar.setImageResource(R.drawable.business);
                             image=null;
                         }
                     })

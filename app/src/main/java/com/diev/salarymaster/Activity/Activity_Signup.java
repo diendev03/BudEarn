@@ -105,7 +105,7 @@ public class Activity_Signup extends AppCompatActivity {
         String phone = edt_phone.getText().toString().trim();
         String fullname = edt_fullname.getText().toString().trim();
         String birthday = tv_birthday.getText().toString().trim();
-        return new User(uuid, email, fullname, birthday, phone);
+        return new User(uuid, email, fullname, birthday, phone,"");
     }
 
     // Đăng kí tài khoản mới

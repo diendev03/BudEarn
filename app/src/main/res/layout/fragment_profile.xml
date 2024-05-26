@@ -1,14 +1,263 @@
-<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment.Fragment_Profile">
+    tools:context=".Fragment.Fragment_Manager">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:background="@color/background"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="20dp"
+        tools:context=".Fragment.Fragment_Manager">
 
+        <RelativeLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp">
+
+            <ImageView
+                android:id="@+id/iv_profile_avatar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@drawable/selector_circle"
+                android:clipToOutline="true"
+                android:src="@drawable/account"
+                tools:ignore="ContentDescription,UnusedAttribute" />
+
+            <ProgressBar
+                android:id="@+id/progressBar_profile_avatar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:indeterminate="true"
+                android:indeterminateDrawable="@drawable/progress_bar"
+                android:indeterminateTint="@color/primary"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_profile_name"
+            style="@style/TextNormal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="10dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="Họ Và Tên" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <TextView
+                style="@style/Headline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:text="Email: " />
+
+            <TextView
+                android:id="@+id/tv_profile_email"
+                style="@style/TextNormal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="6.5"
+                android:ellipsize="end"
+                android:hint="user112345@gmail.com"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <TextView
+                style="@style/Headline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:text="Số điện thoại:" />
+
+            <TextView
+                android:id="@+id/tv_profile_phone"
+                style="@style/TextNormal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="6.5"
+                android:ellipsize="end"
+                android:hint="034 xxxx xxx"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <TextView
+                style="@style/Headline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:text="Ngày sinh:" />
+
+            <TextView
+                android:id="@+id/tv_profile_birthday"
+                style="@style/TextNormal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="6.5"
+                android:ellipsize="end"
+                android:hint="01/01/2024"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <TextView
+                style="@style/Headline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.5"
+                android:text="Lương trung bình:" />
+
+            <TextView
+                android:id="@+id/tv_profile_wage"
+                style="@style/TextNormal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="6.5"
+                android:ellipsize="end"
+                android:hint="10.000.000"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Headline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Đổi mật khẩu:" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <TextView
+                    style="@style/Headline"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.5"
+                    android:text="Mật khẩu hiện tại:" />
+
+                <EditText
+                    android:id="@+id/edt_profile_password"
+                    style="@style/Widget.AppCompat.EditText"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="6.5"
+                    android:background="@drawable/selector_square"
+                    android:inputType="textPassword"
+                    android:paddingStart="10dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/navy"
+                    tools:ignore="Autofill,HardcodedText,RtlSymmetry,TextFields" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="5dp"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <TextView
+                    style="@style/Headline"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3.5"
+                    android:text="Mật khẩu mới:" />
+
+                <EditText
+                    android:id="@+id/edt_profile_new_password"
+                    style="@style/Widget.AppCompat.EditText"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="6.5"
+                    android:background="@drawable/selector_square"
+                    android:inputType="textPassword"
+                    android:paddingStart="10dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/navy"
+                    tools:ignore="Autofill,HardcodedText,RtlSymmetry,TextFields" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_profile_change_password"
+            style="@style/ButtonNormal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/selector_button_normal"
+            android:text="Đổi mật khẩu"
+            tools:ignore="HardcodedText" />
+
+        <Button
+            android:id="@+id/btn_profile_logout"
+            style="@style/ButtonNormal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/selector_button_normal"
+            android:text="Đăng xuất"
+            tools:ignore="HardcodedText" />
+
+    </LinearLayout>
+
+
+    <View
+        android:id="@+id/viewBlocking_profile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@null"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/progressBar_profile"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:background="@null"
+        android:indeterminate="true"
+        android:indeterminateDrawable="@drawable/progress_bar"
+        android:indeterminateTint="@color/primary"
+        android:visibility="gone" />
 </FrameLayout>

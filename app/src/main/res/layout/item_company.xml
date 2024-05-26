@@ -19,7 +19,7 @@
             android:clipToOutline="true"
             android:contentDescription="image_avatar"
             android:scaleType="centerCrop"
-            android:src="@drawable/default_pic"
+            android:src="@drawable/business"
             tools:ignore="HardcodedText,UnusedAttribute" />
 
         <ProgressBar

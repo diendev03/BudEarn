@@ -53,7 +53,7 @@
             android:contentDescription="Thêm ảnh cute cho nơi làm việc"
 
             android:scaleType="centerCrop"
-            android:src="@drawable/default_pic"
+            android:src="@drawable/business"
             tools:ignore="HardcodedText" />
 
         <EditText
