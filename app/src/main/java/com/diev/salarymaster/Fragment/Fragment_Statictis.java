@@ -16,7 +16,7 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.diev.salarymaster.Model.Company;
+import com.diev.salarymaster.Model.Business;
 import com.diev.salarymaster.Model.TimeWork;
 import com.diev.salarymaster.R;
 import com.github.mikephil.charting.charts.BarChart;
@@ -69,7 +69,7 @@ public class Fragment_Statictis extends Fragment {
     private PieChart piechart;
     private BarChart barchart;
     private ArrayList<TimeWork> dataTimeWork = new ArrayList<>();
-    private ArrayList<Company> dataCompany = new ArrayList<>();
+    private ArrayList<Business> dataBusiness = new ArrayList<>();
 
     Spinner monthSpinner;
 
@@ -83,7 +83,7 @@ public class Fragment_Statictis extends Fragment {
         SharedPreferences sharedPreferences = view.getContext().getSharedPreferences(SHARED_PRE, MODE_PRIVATE);
         userId = sharedPreferences.getString(uuid, "");
         setControl(view);
-        getDataCompany();
+        getDataBusiness();
         setEvent();
 
         return view;
@@ -234,7 +234,7 @@ public class Fragment_Statictis extends Fragment {
     }
 
     public static Map<String, Double> filterAndCalculate(List<TimeWork> timeWorks, String monthYear) {
-        Map<String, Double> companyWageMap = new HashMap<>();
+        Map<String, Double> businessWageMap = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         for (TimeWork timeWork : timeWorks) {
@@ -245,13 +245,13 @@ public class Fragment_Statictis extends Fragment {
                     SimpleDateFormat monthYearFormat = new SimpleDateFormat("MM/yyyy");
                     String monthYearOfWork = monthYearFormat.format(sdf.parse(date));
                     if (monthYear.equals(monthYearOfWork)) {
-                        String company = timeWork.getCompany();
+                        String business = timeWork.getBusiness();
                         double totalHours = timeWork.getTotal();
                         double wagePerHour = timeWork.getWage();
-                        double currentTotalWage = companyWageMap.getOrDefault(company, 0.0);
+                        double currentTotalWage = businessWageMap.getOrDefault(business, 0.0);
                         // Calculate total wage and add to the current total
                         double calculatedWage = totalHours * wagePerHour;
-                        companyWageMap.put(company, currentTotalWage + calculatedWage);
+                        businessWageMap.put(business, currentTotalWage + calculatedWage);
                     }
                 }
             } catch (Exception e) {
@@ -259,7 +259,7 @@ public class Fragment_Statictis extends Fragment {
             }
         }
 
-        return companyWageMap;
+        return businessWageMap;
     }
 
     public static Map<Integer, Double> filterByMonth(List<TimeWork> timeWorks, String year) {
@@ -295,15 +295,15 @@ public class Fragment_Statictis extends Fragment {
     }
 
 
-    private void getDataCompany() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Company").child(userId);
+    private void getDataBusiness() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Business").child(userId);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Company company = dataSnapshot.getValue(Company.class);
-                    if (company != null) {
-                        dataCompany.add(company);
+                    Business business = dataSnapshot.getValue(Business.class);
+                    if (business != null) {
+                        dataBusiness.add(business);
                     }
                 }
                 getDataTimework(getCurrentMonthYear());
@@ -357,14 +357,14 @@ public class Fragment_Statictis extends Fragment {
             // If there's data, show the pie chart
             ArrayList<PieEntry> pieEntries = new ArrayList<>();
             for (Map.Entry<String, Double> entry : result.entrySet()) {
-                String companyName = "";
-                for (Company company : dataCompany) {
-                    if (company.getId().equals(entry.getKey())) {
-                        companyName = company.getName();
+                String businessName = "";
+                for (Business business : dataBusiness) {
+                    if (business.getId().equals(entry.getKey())) {
+                        businessName = business.getName();
                     }
                 }
                 double totalWage = entry.getValue();
-                pieEntries.add(new PieEntry((float) totalWage, companyName)); // Use actual company names
+                pieEntries.add(new PieEntry((float) totalWage, businessName)); // Use actual business names
             }
 
             PieDataSet pieDataSet = new PieDataSet(pieEntries, "");

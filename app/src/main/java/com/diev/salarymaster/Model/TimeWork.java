@@ -1,16 +1,16 @@
 package com.diev.salarymaster.Model;
 
 public class TimeWork {
-    String id, uuid, company, date, start, finish;
+    String id, uuid, business, date, start, finish;
     double total,wage;
 
     public TimeWork() {
     }
 
-    public TimeWork(String id, String uuid, String company, String date, String start, String finish, double total, double wage) {
+    public TimeWork(String id, String uuid, String business, String date, String start, String finish, double total, double wage) {
         this.id = id;
         this.uuid = uuid;
-        this.company = company;
+        this.business = business;
         this.date = date;
         this.start = start;
         this.finish = finish;
@@ -34,12 +34,12 @@ public class TimeWork {
         this.total = total;
     }
 
-    public String getCompany() {
-        return company;
+    public String getBusiness() {
+        return business;
     }
 
-    public void setCompany(String company) {
-        this.company = company;
+    public void setBusiness(String business) {
+        this.business = business;
     }
 
     public String getId() {

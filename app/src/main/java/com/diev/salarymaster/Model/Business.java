@@ -1,9 +1,9 @@
 package com.diev.salarymaster.Model;
 
-public class Company {
+public class Business {
     String id, avatar, name, salary, dateStart, uuid;
 
-    public Company(String id, String avatar, String name, String salary, String dateStart, String uuid) {
+    public Business(String id, String avatar, String name, String salary, String dateStart, String uuid) {
         this.id = id;
         this.avatar = avatar;
         this.name = name;
@@ -12,7 +12,7 @@ public class Company {
         this.uuid = uuid;
     }
 
-    public Company() {
+    public Business() {
     }
 
     public String getUuid() {

@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.diev.salarymaster.Model.Company;
+import com.diev.salarymaster.Model.Business;
 import com.diev.salarymaster.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,15 +23,15 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-// Adapter_Company.java
-public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.CompanyViewHolder> {
-    private ArrayList<Company> companies = new ArrayList<>();
+// Adapter_Business.java
+public class Adapter_Business extends RecyclerView.Adapter<Adapter_Business.BusinessViewHolder> {
+    private ArrayList<Business> businessList = new ArrayList<>();
     private Context context;
     private String userId;
     View viewBlocking;
     ProgressBar progressBar;
 
-    public Adapter_Company(Context context, String userId, ProgressBar progressBar) {
+    public Adapter_Business(Context context, String userId, ProgressBar progressBar) {
         this.context = context;
         this.userId = userId;
         this.progressBar = progressBar;
@@ -40,15 +40,15 @@ public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.Compan
 
     private void khoitao() {
         progressBar.setVisibility(View.VISIBLE);
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Company").child(userId);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Business").child(userId);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                companies.clear();
+                businessList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Company company = dataSnapshot.getValue(Company.class);
-                    if (company != null) {
-                        companies.add(company);
+                    Business business = dataSnapshot.getValue(Business.class);
+                    if (business != null) {
+                        businessList.add(business);
                     }
                 }
                 notifyDataSetChanged();
@@ -63,17 +63,17 @@ public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.Compan
 
     @NonNull
     @Override
-    public Adapter_Company.CompanyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemCompany = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_company, parent, false);
-        return new Adapter_Company.CompanyViewHolder(itemCompany);
+    public BusinessViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemBusiness = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_business, parent, false);
+        return new BusinessViewHolder(itemBusiness);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Adapter_Company.CompanyViewHolder holder, int position) {
-        Company company = companies.get(position);
-        holder.tv_name.setText(company.getName());
-        if (company.getAvatar() != null && !company.getAvatar().isEmpty()) {
-            String imageUrl = company.getAvatar();
+    public void onBindViewHolder(@NonNull BusinessViewHolder holder, int position) {
+        Business business = businessList.get(position);
+        holder.tv_name.setText(business.getName());
+        if (business.getAvatar() != null && !business.getAvatar().isEmpty()) {
+            String imageUrl = business.getAvatar();
             holder.progressBar.setVisibility(View.VISIBLE);
             Picasso.get().load(imageUrl).into(holder.iv_avatar, new Callback() {
                 @Override
@@ -92,19 +92,19 @@ public class Adapter_Company extends RecyclerView.Adapter<Adapter_Company.Compan
 
     @Override
     public int getItemCount() {
-        return companies.size();
+        return businessList.size();
     }
 
-    public class CompanyViewHolder extends RecyclerView.ViewHolder {
+    public class BusinessViewHolder extends RecyclerView.ViewHolder {
         ProgressBar progressBar;
         TextView tv_name;
         ImageView iv_avatar;
 
-        public CompanyViewHolder(@NonNull View itemView) {
+        public BusinessViewHolder(@NonNull View itemView) {
             super(itemView);
-            tv_name = itemView.findViewById(R.id.tv_item_company_name);
-            iv_avatar = itemView.findViewById(R.id.iv_item_company_avatar);
-            progressBar = itemView.findViewById(R.id.progressBar_item_company_avatar);
+            tv_name = itemView.findViewById(R.id.tv_item_business_name);
+            iv_avatar = itemView.findViewById(R.id.iv_item_business_avatar);
+            progressBar = itemView.findViewById(R.id.progressBar_item_business_avatar);
         }
     }
 }

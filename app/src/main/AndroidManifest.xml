@@ -37,10 +37,10 @@
             android:name=".Activity.TestActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.Activity_Add_Company"
+            android:name=".Activity.Activity_Add_Business"
             android:exported="false" />
         <activity
-            android:name=".Activity.Activity_Company_Management"
+            android:name=".Activity.Activity_Business_Management"
             android:exported="false" />
         <activity
             android:name=".Activity.Activity_Signup"

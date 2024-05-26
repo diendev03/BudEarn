@@ -20,7 +20,7 @@ import com.diev.salarymaster.Custom.ConfirmationAlert;
 import com.diev.salarymaster.Custom.InformationAlert;
 import com.diev.salarymaster.Custom.ImagePicker;
 import com.diev.salarymaster.Custom.ImageUploader;
-import com.diev.salarymaster.Model.Company;
+import com.diev.salarymaster.Model.Business;
 import com.diev.salarymaster.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,7 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Calendar;
 
-public class Activity_Add_Company extends AppCompatActivity {
+public class Activity_Add_Business extends AppCompatActivity {
     public static String SHARED_PRE = "shared_pre";
     public static String uuid = "uuid";
     String userId;
@@ -44,7 +44,7 @@ public class Activity_Add_Company extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_company);
+        setContentView(R.layout.activity_add_business);
         // Lấy userId từ SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PRE, MODE_PRIVATE);
         userId = sharedPreferences.getString(uuid, "");
@@ -53,18 +53,18 @@ public class Activity_Add_Company extends AppCompatActivity {
         // Thiết lập các sự kiện
         setEvent();
         // Khởi tạo ImageUploader
-        imageUploader = new ImageUploader("Company");
+        imageUploader = new ImageUploader("Business");
     }
 
     // Gán các control trong layout cho biến
     private void setControl() {
-        ib_back = findViewById(R.id.ib_company_back);
-        ib_save = findViewById(R.id.ib_company_new);
-        iv_avatar = findViewById(R.id.iv_add_company_pic);
-        edt_name = findViewById(R.id.edt_add_company_name);
-        edt_salary = findViewById(R.id.edt_add_company_salary);
-        viewBlocking=findViewById(R.id.viewBlocking_add_company);
-        progressBar=findViewById(R.id.progressBar_add_company);
+        ib_back = findViewById(R.id.ib_business_back);
+        ib_save = findViewById(R.id.ib_business_new);
+        iv_avatar = findViewById(R.id.iv_add_business_pic);
+        edt_name = findViewById(R.id.edt_add_business_name);
+        edt_salary = findViewById(R.id.edt_add_business_salary);
+        viewBlocking=findViewById(R.id.viewBlocking_add_business);
+        progressBar=findViewById(R.id.progressBar_add_business);
     }
 
     // Thiết lập các sự kiện
@@ -76,7 +76,7 @@ public class Activity_Add_Company extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Mở hộp thoại để chọn hoặc chụp ảnh
-                ImagePicker.showImagePicker(Activity_Add_Company.this, new ImagePicker.ImagePickerListener() {
+                ImagePicker.showImagePicker(Activity_Add_Business.this, new ImagePicker.ImagePickerListener() {
                     @Override
                     public void onImageChosen(Uri chosenImageUri) {
                         // Xử lý khi đã chọn ảnh thành công
@@ -95,17 +95,17 @@ public class Activity_Add_Company extends AppCompatActivity {
                     // Hiển thị viewBlocking và progressBar
                     viewBlocking.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.VISIBLE);
-                    // Nếu đã chọn ảnh, tiến hành tải lên và tạo đối tượng Company
+                    // Nếu đã chọn ảnh, tiến hành tải lên và tạo đối tượng Business
                     imageUploader.uploadImage(image,
                             new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
                                     // Xử lý khi tải lên ảnh thành công
                                     String imageUrl = uri.toString(); // Lấy đường dẫn của ảnh
-                                    // Tạo đối tượng Company với đường dẫn ảnh imageUrl
-                                    Company company = CreateCompany(imageUrl);
-                                    // Tiếp tục xử lý với đối tượng Company
-                                    CreateCompanyOnFirebase(company);
+                                    // Tạo đối tượng Business với đường dẫn ảnh imageUrl
+                                    Business business = CreateBusiness(imageUrl);
+                                    // Tiếp tục xử lý với đối tượng Business
+                                    CreateBusinessOnFirebase(business);
                                 }
                             },
                             new OnFailureListener() {
@@ -139,15 +139,15 @@ public class Activity_Add_Company extends AppCompatActivity {
         return true;
     }
 
-    // Hàm tạo đối tượng Company và lưu vào Firebase
-    private void CreateCompanyOnFirebase(Company company){
+    // Hàm tạo đối tượng Business và lưu vào Firebase
+    private void CreateBusinessOnFirebase(Business business){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference companyRef = database.getReference("Company").child(userId); // Đường dẫn đến nút "Company/userId/"
-        DatabaseReference newCompanyRef = companyRef.push(); // Tạo một khóa mới cho công ty trong nút "Company/userId/"
-        String companyId = newCompanyRef.getKey(); // Lấy khóa mới tạo
-        if (companyId != null) {
-            company.setId(companyId); // Đặt id của công ty là khóa mới tạo
-            newCompanyRef.setValue(company)
+        DatabaseReference businessRef = database.getReference("Business").child(userId); // Đường dẫn đến nút "Business/userId/"
+        DatabaseReference newBusinessRef = businessRef.push(); // Tạo một khóa mới cho công ty trong nút "Business/userId/"
+        String businessId = newBusinessRef.getKey(); // Lấy khóa mới tạo
+        if (businessId != null) {
+            business.setId(businessId); // Đặt id của công ty là khóa mới tạo
+            newBusinessRef.setValue(business)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -207,16 +207,16 @@ public class Activity_Add_Company extends AppCompatActivity {
         });
     }
 
-    // Hàm tạo đối tượng Company từ dữ liệu nhập vào
-    private Company CreateCompany(String imageUrl) {
+    // Hàm tạo đối tượng Business từ dữ liệu nhập vào
+    private Business CreateBusiness(String imageUrl) {
         String today = setCurrentDate();
-        Company company = new Company();
-        company.setName(edt_name.getText().toString());
-        company.setSalary(edt_salary.getText().toString());
-        company.setDateStart(today);
-        company.setAvatar(imageUrl);
-        company.setUuid(userId);
-        return company;
+        Business business = new Business();
+        business.setName(edt_name.getText().toString());
+        business.setSalary(edt_salary.getText().toString());
+        business.setDateStart(today);
+        business.setAvatar(imageUrl);
+        business.setUuid(userId);
+        return business;
     }
 
     // Hàm lấy ngày hiện tại và định dạng thành chuỗi

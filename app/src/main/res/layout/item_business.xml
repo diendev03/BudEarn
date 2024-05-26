@@ -12,7 +12,7 @@
         android:layout_margin="5dp">
 
         <ImageView
-            android:id="@+id/iv_item_company_avatar"
+            android:id="@+id/iv_item_business_avatar"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/selector_circle"
@@ -23,7 +23,7 @@
             tools:ignore="HardcodedText,UnusedAttribute" />
 
         <ProgressBar
-            android:id="@+id/progressBar_item_company_avatar"
+            android:id="@+id/progressBar_item_business_avatar"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
@@ -35,7 +35,7 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/tv_item_company_name"
+        android:id="@+id/tv_item_business_name"
         style="@style/TextNormal"
             android:layout_width="match_parent"
         android:layout_height="wrap_content"

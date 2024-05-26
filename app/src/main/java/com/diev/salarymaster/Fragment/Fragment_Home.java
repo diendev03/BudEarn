@@ -4,7 +4,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -22,11 +21,10 @@ import android.widget.TimePicker;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.diev.salarymaster.Activity.Activity_Company_Management;
-import com.diev.salarymaster.Adapter.SpinnerCompanyAdapter;
-import com.diev.salarymaster.Custom.ConfirmationAlert;
+import com.diev.salarymaster.Activity.Activity_Business_Management;
+import com.diev.salarymaster.Adapter.SpinnerBusinessAdapter;
 import com.diev.salarymaster.Custom.InformationAlert;
-import com.diev.salarymaster.Model.Company;
+import com.diev.salarymaster.Model.Business;
 import com.diev.salarymaster.Model.TimeWork;
 import com.diev.salarymaster.R;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -40,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -92,15 +89,15 @@ public class Fragment_Home extends Fragment {
     public static String SHARED_PRE = "shared_pre";
     public static String uuid = "uuid";
     private String userId;
-    private Company selectedCompany;
-    private Button btn_companyList, btn_addWorkTime;
+    private Business selectedBusiness;
+    private Button btn_businessList, btn_addWorkTime;
     private TextView tvDate, tvTimeStart, tvTimeFinish;
-    private Spinner sp_company;
+    private Spinner sp_business;
     private ProgressBar progressBar_spinner;
 
 
-    ArrayList<Company> companies = new ArrayList<>();
-    private SpinnerCompanyAdapter companyAdapter;
+    ArrayList<Business> companies = new ArrayList<>();
+    private SpinnerBusinessAdapter businessAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -122,13 +119,13 @@ public class Fragment_Home extends Fragment {
         tvDate = view.findViewById(R.id.tv_home_date);
         tvTimeStart = view.findViewById(R.id.tv_home_timestart);
         tvTimeFinish = view.findViewById(R.id.tv_home_timefinish);
-        btn_companyList=view.findViewById(R.id.btn_home_workList);
+        btn_businessList =view.findViewById(R.id.btn_home_workList);
         btn_addWorkTime = view.findViewById(R.id.btn_home_addWorkTime);
-        sp_company = view.findViewById(R.id.sp_home_company);
+        sp_business = view.findViewById(R.id.sp_home_business);
         progressBar_spinner = view.findViewById(R.id.progressBar_home_spinner);
         // Khởi tạo adapter cho Spinner
-        companyAdapter = new SpinnerCompanyAdapter(requireContext(), companies); // Sử dụng requireContext()
-        sp_company.setAdapter(companyAdapter); // Thiết lập adapter cho Spinner
+        businessAdapter = new SpinnerBusinessAdapter(requireContext(), companies); // Sử dụng requireContext()
+        sp_business.setAdapter(businessAdapter); // Thiết lập adapter cho Spinner
     }
 
     private void setEvent() {
@@ -152,10 +149,10 @@ public class Fragment_Home extends Fragment {
                 showTimePickerDialog(tvTimeFinish);
             }
         });
-        btn_companyList.setOnClickListener(new View.OnClickListener() {
+        btn_businessList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(requireContext(), Activity_Company_Management.class);
+                Intent intent=new Intent(requireContext(), Activity_Business_Management.class);
                 startActivity(intent);
             }
         });
@@ -166,10 +163,10 @@ public class Fragment_Home extends Fragment {
             }
         });
 
-        sp_company.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        sp_business.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedCompany = (Company) parent.getItemAtPosition(position);
+                selectedBusiness = (Business) parent.getItemAtPosition(position);
             }
 
             @Override
@@ -200,11 +197,11 @@ public class Fragment_Home extends Fragment {
         date = tvDate.getText().toString();
         start = tvTimeStart.getText().toString();
         finish = tvTimeFinish.getText().toString();
-        Double wage=Double.parseDouble(selectedCompany.getSalary());
+        Double wage=Double.parseDouble(selectedBusiness.getSalary());
 
         TimeWork timeWork = new TimeWork();
         timeWork.setUuid(userId);
-        timeWork.setCompany(selectedCompany.getId());
+        timeWork.setBusiness(selectedBusiness.getId());
         timeWork.setDate(date);
         timeWork.setStart(start);
         timeWork.setFinish(finish);
@@ -239,21 +236,21 @@ public class Fragment_Home extends Fragment {
 
 
     private void getCompanies(String userId) {
-        sp_company.setVisibility(View.VISIBLE);
-        sp_company.setVisibility(View.GONE);
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Company").child(userId);
+        sp_business.setVisibility(View.VISIBLE);
+        sp_business.setVisibility(View.GONE);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Business").child(userId);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 companies.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Company company = dataSnapshot.getValue(Company.class);
-                    if (company != null) {
-                        companies.add(company);
+                    Business business = dataSnapshot.getValue(Business.class);
+                    if (business != null) {
+                        companies.add(business);
                     }
                 }
-                companyAdapter.notifyDataSetChanged(); // Thông báo cho adapter rằng dữ liệu đã thay đổi
-                sp_company.setVisibility(View.VISIBLE);
+                businessAdapter.notifyDataSetChanged(); // Thông báo cho adapter rằng dữ liệu đã thay đổi
+                sp_business.setVisibility(View.VISIBLE);
                 progressBar_spinner.setVisibility(View.GONE);
                 if (companies.size() == 0) {
                     InformationAlert alert = new InformationAlert("Bạn cần thêm nơi làm việc vào danh sách!!!");
