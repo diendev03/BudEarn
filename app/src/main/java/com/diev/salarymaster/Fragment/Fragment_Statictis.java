@@ -366,7 +366,6 @@ public class Fragment_Statictis extends Fragment {
                 double totalWage = entry.getValue();
                 pieEntries.add(new PieEntry((float) totalWage, businessName)); // Use actual business names
             }
-
             PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
             pieDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
             PieData pieData = new PieData(pieDataSet);

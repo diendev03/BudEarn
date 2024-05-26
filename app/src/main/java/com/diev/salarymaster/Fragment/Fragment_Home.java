@@ -4,6 +4,9 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,10 +16,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.ProgressBar;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -34,10 +38,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -89,11 +98,12 @@ public class Fragment_Home extends Fragment {
     public static String SHARED_PRE = "shared_pre";
     public static String uuid = "uuid";
     private String userId;
-    private Business selectedBusiness;
-    private Button btn_businessList, btn_addWorkTime;
+    private Business selectedBusiness,selectedBusiness_docx;
+    private Button btn_businessList, btn_addWorkTime, btn_copy;
     private TextView tvDate, tvTimeStart, tvTimeFinish;
-    private Spinner sp_business;
-    private ProgressBar progressBar_spinner;
+    private EditText edt_docx;
+    private Spinner sp_business, sp_business_docx;
+    private ArrayList<TimeWork> dataTimeWork = new ArrayList<>();
 
 
     ArrayList<Business> companies = new ArrayList<>();
@@ -108,7 +118,7 @@ public class Fragment_Home extends Fragment {
         // Lấy userId từ SharedPreferences
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences(SHARED_PRE, MODE_PRIVATE); // Thay đổi để sử dụng requireContext()
         userId = sharedPreferences.getString(uuid, "");
-
+        getDataTimework();
         setEvent();
         setCurrentDate();
         getCompanies(userId);
@@ -119,13 +129,16 @@ public class Fragment_Home extends Fragment {
         tvDate = view.findViewById(R.id.tv_home_date);
         tvTimeStart = view.findViewById(R.id.tv_home_timestart);
         tvTimeFinish = view.findViewById(R.id.tv_home_timefinish);
+        edt_docx = view.findViewById(R.id.edt_home_docx);
         btn_businessList =view.findViewById(R.id.btn_home_workList);
         btn_addWorkTime = view.findViewById(R.id.btn_home_addWorkTime);
+        btn_copy = view.findViewById(R.id.btn_home_copy);
         sp_business = view.findViewById(R.id.sp_home_business);
-        progressBar_spinner = view.findViewById(R.id.progressBar_home_spinner);
+        sp_business_docx = view.findViewById(R.id.sp_home_business1);
         // Khởi tạo adapter cho Spinner
         businessAdapter = new SpinnerBusinessAdapter(requireContext(), companies); // Sử dụng requireContext()
         sp_business.setAdapter(businessAdapter); // Thiết lập adapter cho Spinner
+        sp_business_docx.setAdapter(businessAdapter); // Thiết lập adapter cho Spinner
     }
 
     private void setEvent() {
@@ -174,8 +187,122 @@ public class Fragment_Home extends Fragment {
                 // Xử lý khi không có gì được chọn
             }
         });
+        sp_business_docx.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedBusiness_docx = (Business) parent.getItemAtPosition(position);
 
+                List<String> formattedList = formatTimeWorkList(filterData(dataTimeWork,selectedBusiness_docx.getId()));
+
+                // Chuyển đổi danh sách đã định dạng thành một chuỗi duy nhất
+                String formattedString = convertListToString(formattedList);
+
+                // Thiết lập dữ liệu cho EditText
+                edt_docx.setText(formattedString);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Xử lý khi không có gì được chọn
+            }
+        });
+        btn_copy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                copyTextToClipboard(edt_docx.getText().toString());
+            }
+        });
+    }// Hàm sao chép nội dung vào bộ nhớ tạm
+    private void copyTextToClipboard(String text) {
+        ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("formattedText", text);
+        clipboard.setPrimaryClip(clip);
+
+        Toast.makeText(requireContext(), "Text copied to clipboard", Toast.LENGTH_SHORT).show();
     }
+    public List<String> formatTimeWorkList(List<TimeWork> timeWorkList) {
+        Map<String, List<TimeWork>> groupedData = new HashMap<>();
+        for (TimeWork timeWork : timeWorkList) {
+            String date = timeWork.getDate();
+            if (!groupedData.containsKey(date)) {
+                groupedData.put(date, new ArrayList<>());
+            }
+            groupedData.get(date).add(timeWork);
+        }
+
+        List<String> formattedList = new ArrayList<>();
+        for (Map.Entry<String, List<TimeWork>> entry : groupedData.entrySet()) {
+            StringBuilder formatted = new StringBuilder(entry.getKey() + ": ");
+            List<TimeWork> works = entry.getValue();
+            for (int i = 0; i < works.size(); i++) {
+                formatted.append(works.get(i).getFormattedTime());
+                if (i < works.size() - 1) {
+                    formatted.append(" & ");
+                }
+            }
+            formattedList.add(formatted.toString());
+        }
+
+        return formattedList;
+    }
+
+    // Hàm convertListToString
+    public String convertListToString(List<String> formattedList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String formatted : formattedList) {
+            stringBuilder.append(formatted).append("\n");
+        }
+        return stringBuilder.toString();
+    }
+    private static ArrayList<TimeWork> filterData(ArrayList<TimeWork> timeWorks, String business) {
+        // Lấy thời gian hiện tại
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH) + 1;
+
+        ArrayList<TimeWork> filteredList = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        for (TimeWork timeWork : timeWorks) {
+            try {
+                Date date = sdf.parse(timeWork.getDate());
+                Calendar timeWorkCalendar = Calendar.getInstance();
+                timeWorkCalendar.setTime(date);
+
+                int year = timeWorkCalendar.get(Calendar.YEAR);
+                int month = timeWorkCalendar.get(Calendar.MONTH) + 1;
+
+                if (year == currentYear && month == currentMonth && timeWork.getBusiness().equals(business)) {
+                    filteredList.add(timeWork);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return filteredList;
+    }
+    private void getDataTimework() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("TimeWork").child(userId);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                dataTimeWork.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    TimeWork timeWork = dataSnapshot.getValue(TimeWork.class);
+                    if (timeWork != null) {
+                        dataTimeWork.add(timeWork);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle error
+            }
+        });
+    }
+
     private void createTimeWork(TimeWork timeWork){
         FirebaseDatabase database=FirebaseDatabase.getInstance();
         DatabaseReference tw=database.getReference("TimeWork").child(userId);
@@ -237,7 +364,6 @@ public class Fragment_Home extends Fragment {
 
     private void getCompanies(String userId) {
         sp_business.setVisibility(View.VISIBLE);
-        sp_business.setVisibility(View.GONE);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Business").child(userId);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -251,7 +377,6 @@ public class Fragment_Home extends Fragment {
                 }
                 businessAdapter.notifyDataSetChanged(); // Thông báo cho adapter rằng dữ liệu đã thay đổi
                 sp_business.setVisibility(View.VISIBLE);
-                progressBar_spinner.setVisibility(View.GONE);
                 if (companies.size() == 0) {
                     InformationAlert alert = new InformationAlert("Bạn cần thêm nơi làm việc vào danh sách!!!");
                     alert.show(getParentFragmentManager(), "custom_dialog_fragment"); // Sử dụng getParentFragmentManager()

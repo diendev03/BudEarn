@@ -81,4 +81,7 @@ public class TimeWork {
     public void setFinish(String finish) {
         this.finish = finish;
     }
+    public String getFormattedTime() {
+        return start + " - " + finish;
+    }
 }

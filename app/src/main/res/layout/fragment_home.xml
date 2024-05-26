@@ -40,8 +40,8 @@
                 android:id="@+id/sp_home_business"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_marginBottom="10dp"
                 android:layout_centerInParent="true"
+                android:layout_marginBottom="10dp"
                 android:background="@drawable/selector_square"
                 android:gravity="center" />
         </RelativeLayout>
@@ -50,11 +50,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:background="@color/background"
             android:gravity="center"
             android:orientation="horizontal"
-            android:weightSum="9"
-            android:layout_marginBottom="10dp">
+            android:weightSum="9">
 
             <TextView
                 android:id="@+id/tv_home_date"
@@ -119,6 +119,7 @@
             android:background="@drawable/selector_button_normal"
             android:text="Xem danh sách nơi làm việc"
             tools:ignore="HardcodedText" />
+
         <Button
             android:id="@+id/btn_home_salary"
             style="@style/ButtonNormal"
@@ -126,8 +127,46 @@
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/selector_button_normal"
-            android:text="Xem tổng tiền lương tháng này"
+            android:text="Xem nội dung giờ làm tháng này"
             tools:ignore="HardcodedText" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <Spinner
+                android:id="@+id/sp_home_business1"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="7"
+                android:background="@drawable/selector_square"
+                android:gravity="center" />
+
+            <Button
+                android:id="@+id/btn_home_copy"
+                style="@style/ButtonNormal"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginStart="10dp"
+                android:layout_weight="3"
+                android:background="@drawable/selector_button_normal"
+                android:text="COPY"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/edt_home_docx"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="10dp"
+            android:background="@drawable/selector_square" />
     </LinearLayout>
 
 </FrameLayout>
