@@ -98,16 +98,17 @@ public class Fragment_Home extends Fragment {
     public static String SHARED_PRE = "shared_pre";
     public static String uuid = "uuid";
     private String userId;
-    private Business selectedBusiness,selectedBusiness_docx;
-    private Button btn_businessList, btn_addWorkTime, btn_copy;
-    private TextView tvDate, tvTimeStart, tvTimeFinish;
-    private EditText edt_docx;
+    private Business selectedBusiness, selectedBusiness_docx;
+    private Button btn_businessList, btn_addWorkTime, btn_filter,btn_copy;
+    private TextView tvDate, tvTimeStart, tvTimeFinish, tv_start_filter, tv_end_filter;
+    private EditText edt_docx, edt_note;
     private Spinner sp_business, sp_business_docx;
     private ArrayList<TimeWork> dataTimeWork = new ArrayList<>();
 
 
     ArrayList<Business> companies = new ArrayList<>();
     private SpinnerBusinessAdapter businessAdapter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -129,12 +130,16 @@ public class Fragment_Home extends Fragment {
         tvDate = view.findViewById(R.id.tv_home_date);
         tvTimeStart = view.findViewById(R.id.tv_home_timestart);
         tvTimeFinish = view.findViewById(R.id.tv_home_timefinish);
+        tv_start_filter = view.findViewById(R.id.tv_home_start);
+        tv_end_filter = view.findViewById(R.id.tv_home_end);
         edt_docx = view.findViewById(R.id.edt_home_docx);
-        btn_businessList =view.findViewById(R.id.btn_home_workList);
+        edt_note = view.findViewById(R.id.edt_home_note);
+        btn_businessList = view.findViewById(R.id.btn_home_business);
         btn_addWorkTime = view.findViewById(R.id.btn_home_addWorkTime);
+        btn_filter = view.findViewById(R.id.btn_home_filter);
         btn_copy = view.findViewById(R.id.btn_home_copy);
         sp_business = view.findViewById(R.id.sp_home_business);
-        sp_business_docx = view.findViewById(R.id.sp_home_business1);
+        sp_business_docx = view.findViewById(R.id.sp_home_business_filter);
         // Khởi tạo adapter cho Spinner
         businessAdapter = new SpinnerBusinessAdapter(requireContext(), companies); // Sử dụng requireContext()
         sp_business.setAdapter(businessAdapter); // Thiết lập adapter cho Spinner
@@ -145,35 +150,26 @@ public class Fragment_Home extends Fragment {
         tvDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDatePickerDialog();
+                showDatePickerDialog(tvDate);
             }
         });
+        tv_start_filter.setOnClickListener(v -> showDatePickerDialog(tv_start_filter));
+        tv_end_filter.setOnClickListener(v -> showDatePickerDialog(tv_end_filter));
+        tvTimeStart.setOnClickListener(v -> showTimePickerDialog(tvTimeStart));
 
-        tvTimeStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTimePickerDialog(tvTimeStart);
-            }
+        tvTimeFinish.setOnClickListener(v -> showTimePickerDialog(tvTimeFinish));
+        btn_businessList.setOnClickListener(view -> {
+            Intent intent = new Intent(requireContext(), Activity_Business_Management.class);
+            startActivity(intent);
         });
+        btn_addWorkTime.setOnClickListener(view -> createTimeWork(addTimeWork(userId)));
+        btn_filter.setOnClickListener(v -> {
+            String start=tv_start_filter.getText().toString(),end=tv_end_filter.getText().toString();
+            // Chuyển đổi danh sách đã định dạng thành một chuỗi duy nhất
+            String formattedString = convertListToString(formatTimeWorkList(filterData(dataTimeWork, selectedBusiness_docx.getId(),start,end)));
 
-        tvTimeFinish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showTimePickerDialog(tvTimeFinish);
-            }
-        });
-        btn_businessList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(requireContext(), Activity_Business_Management.class);
-                startActivity(intent);
-            }
-        });
-        btn_addWorkTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createTimeWork(addTimeWork(userId));
-            }
+            // Thiết lập dữ liệu cho EditText
+            edt_docx.setText(formattedString);
         });
 
         sp_business.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -191,14 +187,6 @@ public class Fragment_Home extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedBusiness_docx = (Business) parent.getItemAtPosition(position);
-
-                List<String> formattedList = formatTimeWorkList(filterData(dataTimeWork,selectedBusiness_docx.getId()));
-
-                // Chuyển đổi danh sách đã định dạng thành một chuỗi duy nhất
-                String formattedString = convertListToString(formattedList);
-
-                // Thiết lập dữ liệu cho EditText
-                edt_docx.setText(formattedString);
             }
 
             @Override
@@ -206,20 +194,17 @@ public class Fragment_Home extends Fragment {
                 // Xử lý khi không có gì được chọn
             }
         });
-        btn_copy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                copyTextToClipboard(edt_docx.getText().toString());
-            }
-        });
+        btn_copy.setOnClickListener(v -> copyTextToClipboard(edt_docx.getText().toString()));
     }// Hàm sao chép nội dung vào bộ nhớ tạm
+
     private void copyTextToClipboard(String text) {
         ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("formattedText", text);
         clipboard.setPrimaryClip(clip);
 
-        Toast.makeText(requireContext(), "Text copied to clipboard", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "Đã copy nội dung thành công", Toast.LENGTH_SHORT).show();
     }
+
     public List<String> formatTimeWorkList(List<TimeWork> timeWorkList) {
         Map<String, List<TimeWork>> groupedData = new HashMap<>();
         for (TimeWork timeWork : timeWorkList) {
@@ -254,34 +239,33 @@ public class Fragment_Home extends Fragment {
         }
         return stringBuilder.toString();
     }
-    private static ArrayList<TimeWork> filterData(ArrayList<TimeWork> timeWorks, String business) {
-        // Lấy thời gian hiện tại
-        Calendar calendar = Calendar.getInstance();
-        int currentYear = calendar.get(Calendar.YEAR);
-        int currentMonth = calendar.get(Calendar.MONTH) + 1;
 
+    private static ArrayList<TimeWork> filterData(ArrayList<TimeWork> timeWorks, String business, String startDate, String endDate) {
         ArrayList<TimeWork> filteredList = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-        for (TimeWork timeWork : timeWorks) {
-            try {
-                Date date = sdf.parse(timeWork.getDate());
-                Calendar timeWorkCalendar = Calendar.getInstance();
-                timeWorkCalendar.setTime(date);
+        try {
+            Date start = sdf.parse(startDate);
+            Date end = sdf.parse(endDate);
 
-                int year = timeWorkCalendar.get(Calendar.YEAR);
-                int month = timeWorkCalendar.get(Calendar.MONTH) + 1;
+            for (TimeWork timeWork : timeWorks) {
+                try {
+                    Date date = sdf.parse(timeWork.getDate());
 
-                if (year == currentYear && month == currentMonth && timeWork.getBusiness().equals(business)) {
-                    filteredList.add(timeWork);
+                    if (!date.before(start) && !date.after(end) && timeWork.getBusiness().equals(business)) {
+                        filteredList.add(timeWork);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
             }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
         return filteredList;
     }
+
     private void getDataTimework() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("TimeWork").child(userId);
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -303,12 +287,12 @@ public class Fragment_Home extends Fragment {
         });
     }
 
-    private void createTimeWork(TimeWork timeWork){
-        FirebaseDatabase database=FirebaseDatabase.getInstance();
-        DatabaseReference tw=database.getReference("TimeWork").child(userId);
-        DatabaseReference newTimeWork=tw.push();
-        String timeWorkId=newTimeWork.getKey();
-        if (timeWorkId!=null){
+    private void createTimeWork(TimeWork timeWork) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference tw = database.getReference("TimeWork").child(userId);
+        DatabaseReference newTimeWork = tw.push();
+        String timeWorkId = newTimeWork.getKey();
+        if (timeWorkId != null) {
             timeWork.setId(timeWorkId);
             newTimeWork.setValue(timeWork).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
@@ -319,17 +303,24 @@ public class Fragment_Home extends Fragment {
             });
         }
     }
+
     private TimeWork addTimeWork(String userId) {
-        String date, start, finish;
+        String date, start, finish, note;
         date = tvDate.getText().toString();
         start = tvTimeStart.getText().toString();
         finish = tvTimeFinish.getText().toString();
-        Double wage=Double.parseDouble(selectedBusiness.getSalary());
+        if(edt_note.getText().toString().trim().isEmpty()){
+            note="";
+        }else {
+            note = edt_note.getText().toString();
+        }
+        Double wage = Double.parseDouble(selectedBusiness.getSalary());
 
         TimeWork timeWork = new TimeWork();
         timeWork.setUuid(userId);
         timeWork.setBusiness(selectedBusiness.getId());
         timeWork.setDate(date);
+        timeWork.setNote(note);
         timeWork.setStart(start);
         timeWork.setFinish(finish);
         timeWork.setWage(wage);
@@ -390,7 +381,7 @@ public class Fragment_Home extends Fragment {
         });
     }
 
-    private void showDatePickerDialog() {
+    private void showDatePickerDialog(TextView tvDate) {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
@@ -435,6 +426,7 @@ public class Fragment_Home extends Fragment {
         // Hiển thị dialog
         timePickerDialog.show();
     }
+
     private void setCurrentDate() {
         // Lấy ngày tháng năm hiện tại
         Calendar calendar = Calendar.getInstance();

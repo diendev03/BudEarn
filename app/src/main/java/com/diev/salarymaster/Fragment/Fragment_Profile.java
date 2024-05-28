@@ -2,12 +2,16 @@ package com.diev.salarymaster.Fragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.icu.util.Calendar;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +22,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.diev.salarymaster.Activity.Activity_Login;
+import com.diev.salarymaster.Model.TimeWork;
 import com.diev.salarymaster.Model.User;
 import com.diev.salarymaster.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +39,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -76,6 +95,7 @@ public class Fragment_Profile extends Fragment {
     Button btn_change, btn_logout;
     View viewBlocking;
     ProgressBar progressBar, progressBar_avatar;
+    ArrayList<TimeWork> dataTimeWork=new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -110,7 +130,21 @@ public class Fragment_Profile extends Fragment {
     }
 
     private void setEvent() {
-        // Add event handling code here
+        getDataTimework();
+        btn_change.setOnClickListener(v -> changePassword());
+        btn_logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                SharedPreferences sharedPreferences = requireContext().getSharedPreferences(SHARED_PRE, MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply();
+                // Kết thúc hoạt động và quay về màn hình đăng nhập
+                requireActivity().finish();
+                startActivity(new Intent(requireContext(), Activity_Login.class));
+            }
+        });
     }
 
     private void getInformation(String userId) {
@@ -135,14 +169,21 @@ public class Fragment_Profile extends Fragment {
             }
         });
     }
+    private void clearData(String userId) {
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(SHARED_PRE, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(userId);
+        editor.apply();
+    }
+
+
 
     private void setData(User user) {
-        if (isAdded()) { // Ensure fragment is attached to activity
+        if (isAdded()) {
             tv_name.setText(user.getFullname());
             tv_phone.setText(user.getPhone());
             tv_email.setText(user.getEmail());
             tv_birthday.setText(user.getBirthday());
-            // Optionally set other user data like avatar and wage if needed
             if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
                 String imageUrl = user.getAvatar();
                 progressBar_avatar.setVisibility(View.VISIBLE);
@@ -160,5 +201,109 @@ public class Fragment_Profile extends Fragment {
                 });
             }
         }
+    }
+
+    private void getDataTimework() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("TimeWork").child(userId);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                dataTimeWork.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    TimeWork timeWork = dataSnapshot.getValue(TimeWork.class);
+                    if (timeWork != null) {
+                        dataTimeWork.add(timeWork);
+                    }
+                }
+                tv_wage.setText(calculateAverageMonthlyWage(dataTimeWork)+"  VNđ/tháng");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Xử lý lỗi
+            }
+        });
+    }
+
+    private static int calculateAverageMonthlyWage(ArrayList<TimeWork> timeWorks) {
+        Map<String, Double> totalWages = new HashMap<>();
+        Map<String, Integer> months = new HashMap<>();
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        for (TimeWork timeWork : timeWorks) {
+            try {
+                Date date = sdf.parse(timeWork.getDate());
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+                String monthKey = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1);
+
+                double totalWageOfMonth = timeWork.getTotal() * timeWork.getWage();
+                totalWages.put(monthKey, totalWages.getOrDefault(monthKey, 0.0) + totalWageOfMonth);
+                months.put(monthKey, 1);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        double totalWage = 0;
+        for (double wage : totalWages.values()) {
+            totalWage += wage;
+        }
+
+        int totalMonths = months.size();
+
+        return (int) (totalWage / totalMonths);
+    }
+
+    private void changePassword() {
+        // Lấy thông tin mật khẩu từ EditTexts
+        String currentPassword = edt_password.getText().toString().trim();
+        String newPassword = edt_newpassword.getText().toString().trim();
+        String confirmPassword = edt_newpassword.getText().toString().trim();
+
+        // Kiểm tra xem các trường đã được nhập đầy đủ chưa
+        if (TextUtils.isEmpty(currentPassword) || TextUtils.isEmpty(newPassword) || TextUtils.isEmpty(confirmPassword)) {
+            Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Kiểm tra mật khẩu mới và mật khẩu xác nhận có trùng khớp không
+        if (!newPassword.equals(confirmPassword)) {
+            Toast.makeText(requireContext(), "Mật khẩu mới và mật khẩu xác nhận không trùng khớp", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Lấy người dùng hiện tại
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Xác thực mật khẩu hiện tại
+        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), currentPassword);
+        user.reauthenticate(credential)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            // Xác thực thành công, tiếp tục thay đổi mật khẩu
+                            user.updatePassword(newPassword)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                // Thay đổi mật khẩu thành công
+                                                Toast.makeText(requireContext(), "Thay đổi mật khẩu thành công", Toast.LENGTH_SHORT).show();
+
+                                            } else {
+                                                // Thất bại khi thay đổi mật khẩu
+                                                Toast.makeText(requireContext(), "Thay đổi mật khẩu thất bại", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                        } else {
+                            // Xác thực thất bại
+                            Toast.makeText(requireContext(), "Xác thực mật khẩu hiện tại thất bại", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }

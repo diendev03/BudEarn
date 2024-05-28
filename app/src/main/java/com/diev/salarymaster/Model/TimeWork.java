@@ -1,21 +1,30 @@
 package com.diev.salarymaster.Model;
 
 public class TimeWork {
-    String id, uuid, business, date, start, finish;
-    double total,wage;
+    String id, uuid, business, date, start, finish, note;
+    double total, wage;
 
     public TimeWork() {
     }
 
-    public TimeWork(String id, String uuid, String business, String date, String start, String finish, double total, double wage) {
+    public TimeWork(String id, String uuid, String business, String date, String start, String finish, String note, double total, double wage) {
         this.id = id;
         this.uuid = uuid;
         this.business = business;
         this.date = date;
         this.start = start;
         this.finish = finish;
+        this.note = note;
         this.total = total;
         this.wage = wage;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public double getTotal() {
@@ -81,7 +90,13 @@ public class TimeWork {
     public void setFinish(String finish) {
         this.finish = finish;
     }
+
     public String getFormattedTime() {
-        return start + " - " + finish;
+        if (!note.isEmpty()) {
+            return start + " - " + finish + " (" + note + ")";
+        } else {
+            return start + " - " + finish;
+        }
     }
+
 }

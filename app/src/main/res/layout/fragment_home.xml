@@ -10,48 +10,20 @@
         android:layout_height="match_parent"
         android:background="@color/background"
         android:orientation="vertical"
-        android:padding="20dp"
-        tools:ignore="UselessParent">
+        android:padding="20dp">
 
-        <TextView
-            style="@style/Headline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="10dp"
-            android:text="Thêm giờ làm mới"
-            tools:ignore="HardcodedText" />
-
-        <RelativeLayout
+        <Spinner
+            android:id="@+id/sp_home_business"
             android:layout_width="match_parent"
-            android:layout_height="40dp">
-
-            <ProgressBar
-                android:id="@+id/progressBar_home_spinner"
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                android:background="@null"
-                android:indeterminate="true"
-                android:indeterminateDrawable="@drawable/progress_bar"
-                android:indeterminateTint="@color/primary"
-                android:visibility="gone" />
-
-            <Spinner
-                android:id="@+id/sp_home_business"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_centerInParent="true"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/selector_square"
-                android:gravity="center" />
-        </RelativeLayout>
-
+            android:layout_height="40dp"
+            android:layout_marginVertical="10dp"
+            android:background="@drawable/selector_square"
+            android:gravity="center" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:background="@color/background"
             android:gravity="center"
             android:orientation="horizontal"
             android:weightSum="9">
@@ -65,7 +37,6 @@
                 android:layout_weight="3"
                 android:background="@drawable/selector_square"
                 android:clickable="true"
-                android:focusable="false"
                 android:gravity="center"
                 android:hint="@string/format_date"
                 android:textColorHint="@color/navy" />
@@ -75,12 +46,10 @@
                 style="@style/TextNormal"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginHorizontal="10dp"
                 android:layout_weight="3"
                 android:background="@drawable/selector_square"
                 android:clickable="true"
-                android:focusable="false"
                 android:gravity="center"
                 android:hint="@string/format_time"
                 android:textColorHint="@color/navy" />
@@ -94,28 +63,39 @@
                 android:layout_weight="3"
                 android:background="@drawable/selector_square"
                 android:clickable="true"
-                android:focusable="false"
                 android:gravity="center"
                 android:hint="@string/format_time"
                 android:textColorHint="@color/navy" />
         </LinearLayout>
 
+        <EditText
+            android:id="@+id/edt_home_note"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:autofillHints="ghi chú"
+            android:background="@drawable/selector_square"
+            android:inputType="textAutoComplete"
+            android:maxLines="1"
+            android:hint="ghi chú"
+            android:layout_marginBottom="10dp"
+            android:paddingHorizontal="10dp"
+            tools:ignore="HardcodedText" />
         <Button
             android:id="@+id/btn_home_addWorkTime"
             style="@style/ButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/selector_button_normal"
-            android:text="Xác nhận thêm"
+            android:text="Thêm giờ làm"
             tools:ignore="HardcodedText" />
 
         <Button
-            android:id="@+id/btn_home_workList"
+            android:id="@+id/btn_home_business"
             style="@style/ButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/selector_button_normal"
             android:text="Xem danh sách nơi làm việc"
             tools:ignore="HardcodedText" />
@@ -125,48 +105,97 @@
             style="@style/ButtonNormal"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/selector_button_normal"
-            android:text="Xem nội dung giờ làm tháng này"
+            android:text="Quản lý giờ làm tháng này"
             tools:ignore="HardcodedText" />
+
+        <TextView
+            style="@style/Headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Tìm kiếm dữ liệu làm việc"
+            tools:ignore="HardcodedText" />
+
+        <Spinner
+            android:id="@+id/sp_home_business_filter"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginVertical="10dp"
+            android:background="@drawable/selector_square"
+            android:gravity="center" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:orientation="horizontal"
-            android:weightSum="10">
+            android:weightSum="2">
 
-            <Spinner
-                android:id="@+id/sp_home_business1"
+            <TextView
+                android:id="@+id/tv_home_start"
+                style="@style/TextNormal"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_centerInParent="true"
                 android:layout_marginEnd="10dp"
-                android:layout_weight="7"
+                android:layout_weight="1"
                 android:background="@drawable/selector_square"
-                android:gravity="center" />
+                android:clickable="true"
+                android:gravity="center"
+                android:hint="@string/format_date"
+                android:textColorHint="@color/navy" />
+
+            <TextView
+                android:id="@+id/tv_home_end"
+                style="@style/TextNormal"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_square"
+                android:clickable="true"
+                android:gravity="center"
+                android:hint="@string/format_date"
+                android:textColorHint="@color/navy" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btn_home_filter"
+                style="@style/ButtonNormal"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_button_normal"
+                android:text="Lọc"
+                tools:ignore="HardcodedText" />
 
             <Button
                 android:id="@+id/btn_home_copy"
                 style="@style/ButtonNormal"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_gravity="end"
                 android:layout_marginStart="10dp"
-                android:layout_weight="3"
+                android:layout_weight="1"
                 android:background="@drawable/selector_button_normal"
                 android:text="COPY"
                 tools:ignore="HardcodedText" />
-
         </LinearLayout>
 
         <EditText
             android:id="@+id/edt_home_docx"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingHorizontal="10dp"
-            android:background="@drawable/selector_square" />
+            android:background="@drawable/selector_square"
+            android:editable="false"
+            android:gravity="start"
+            android:paddingHorizontal="10dp" />
     </LinearLayout>
 
 </FrameLayout>
