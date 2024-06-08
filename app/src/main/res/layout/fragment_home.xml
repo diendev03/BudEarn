@@ -195,6 +195,7 @@
             android:background="@drawable/selector_square"
             android:editable="false"
             android:gravity="start"
+            android:textSize="14sp"
             android:paddingHorizontal="10dp" />
     </LinearLayout>
 

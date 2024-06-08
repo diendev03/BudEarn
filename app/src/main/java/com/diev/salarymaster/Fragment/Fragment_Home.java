@@ -42,8 +42,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -99,7 +101,7 @@ public class Fragment_Home extends Fragment {
     public static String uuid = "uuid";
     private String userId;
     private Business selectedBusiness, selectedBusiness_docx;
-    private Button btn_businessList, btn_addWorkTime, btn_filter,btn_copy;
+    private Button btn_businessList, btn_addWorkTime, btn_filter, btn_copy;
     private TextView tvDate, tvTimeStart, tvTimeFinish, tv_start_filter, tv_end_filter;
     private EditText edt_docx, edt_note;
     private Spinner sp_business, sp_business_docx;
@@ -121,7 +123,6 @@ public class Fragment_Home extends Fragment {
         userId = sharedPreferences.getString(uuid, "");
         getDataTimework();
         setEvent();
-        setCurrentDate();
         getCompanies(userId);
         return view;
     }
@@ -146,13 +147,18 @@ public class Fragment_Home extends Fragment {
         sp_business_docx.setAdapter(businessAdapter); // Thiết lập adapter cho Spinner
     }
 
+    private void refresh() {
+        tvTimeStart.setText(null);
+        tvTimeFinish.setText(null);
+        edt_note.setText(null);
+        setCurrentDate(tvDate);
+    }
+
     private void setEvent() {
-        tvDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePickerDialog(tvDate);
-            }
-        });
+        setCurrentDate(tvDate);
+        setCurrentDate(tv_start_filter);
+        setCurrentDate(tv_end_filter);
+        tvDate.setOnClickListener(v -> showDatePickerDialog(tvDate));
         tv_start_filter.setOnClickListener(v -> showDatePickerDialog(tv_start_filter));
         tv_end_filter.setOnClickListener(v -> showDatePickerDialog(tv_end_filter));
         tvTimeStart.setOnClickListener(v -> showTimePickerDialog(tvTimeStart));
@@ -162,11 +168,17 @@ public class Fragment_Home extends Fragment {
             Intent intent = new Intent(requireContext(), Activity_Business_Management.class);
             startActivity(intent);
         });
-        btn_addWorkTime.setOnClickListener(view -> createTimeWork(addTimeWork(userId)));
+        btn_addWorkTime.setOnClickListener(v -> {
+            createTimeWork(addTimeWork(userId));
+            refresh();
+        });
         btn_filter.setOnClickListener(v -> {
-            String start=tv_start_filter.getText().toString(),end=tv_end_filter.getText().toString();
+            String start = tv_start_filter.getText().toString(), end = tv_end_filter.getText().toString();
+            ArrayList<TimeWork>sortList= sortTimeWorkByDate(filterData(dataTimeWork, selectedBusiness_docx.getId(), start, end));
+
             // Chuyển đổi danh sách đã định dạng thành một chuỗi duy nhất
-            String formattedString = convertListToString(formatTimeWorkList(filterData(dataTimeWork, selectedBusiness_docx.getId(),start,end)));
+            String formattedString = convertListToString(formatTimeWorkList(sortList));
+
 
             // Thiết lập dữ liệu cho EditText
             edt_docx.setText(formattedString);
@@ -195,7 +207,26 @@ public class Fragment_Home extends Fragment {
             }
         });
         btn_copy.setOnClickListener(v -> copyTextToClipboard(edt_docx.getText().toString()));
-    }// Hàm sao chép nội dung vào bộ nhớ tạm
+    }
+    public static ArrayList<TimeWork> sortTimeWorkByDate(ArrayList<TimeWork> myObjects) {
+        Collections.sort(myObjects, new Comparator<TimeWork>() {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+            @Override
+            public int compare(TimeWork o1, TimeWork o2) {
+                try {
+                    Date date1 = sdf.parse(o1.getDate());
+                    Date date2 = sdf.parse(o2.getDate());
+                    return date1.compareTo(date2);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        return myObjects;
+    }
+    // Hàm sao chép nội dung vào bộ nhớ tạm
 
     private void copyTextToClipboard(String text) {
         ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -205,8 +236,8 @@ public class Fragment_Home extends Fragment {
         Toast.makeText(requireContext(), "Đã copy nội dung thành công", Toast.LENGTH_SHORT).show();
     }
 
-    public List<String> formatTimeWorkList(List<TimeWork> timeWorkList) {
-        Map<String, List<TimeWork>> groupedData = new HashMap<>();
+    public static List<String> formatTimeWorkList(List<TimeWork> timeWorkList) {
+        Map<String, List<TimeWork>> groupedData = new LinkedHashMap<>();
         for (TimeWork timeWork : timeWorkList) {
             String date = timeWork.getDate();
             if (!groupedData.containsKey(date)) {
@@ -217,12 +248,12 @@ public class Fragment_Home extends Fragment {
 
         List<String> formattedList = new ArrayList<>();
         for (Map.Entry<String, List<TimeWork>> entry : groupedData.entrySet()) {
-            StringBuilder formatted = new StringBuilder(entry.getKey() + ": ");
+            StringBuilder formatted = new StringBuilder(entry.getKey() + ": \n     ");
             List<TimeWork> works = entry.getValue();
             for (int i = 0; i < works.size(); i++) {
                 formatted.append(works.get(i).getFormattedTime());
                 if (i < works.size() - 1) {
-                    formatted.append(" & ");
+                    formatted.append("\n     ");
                 }
             }
             formattedList.add(formatted.toString());
@@ -309,9 +340,9 @@ public class Fragment_Home extends Fragment {
         date = tvDate.getText().toString();
         start = tvTimeStart.getText().toString();
         finish = tvTimeFinish.getText().toString();
-        if(edt_note.getText().toString().trim().isEmpty()){
-            note="";
-        }else {
+        if (edt_note.getText().toString().trim().isEmpty()) {
+            note = "";
+        } else {
             note = edt_note.getText().toString();
         }
         Double wage = Double.parseDouble(selectedBusiness.getSalary());
@@ -427,7 +458,7 @@ public class Fragment_Home extends Fragment {
         timePickerDialog.show();
     }
 
-    private void setCurrentDate() {
+    private void setCurrentDate(TextView tvDate) {
         // Lấy ngày tháng năm hiện tại
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);

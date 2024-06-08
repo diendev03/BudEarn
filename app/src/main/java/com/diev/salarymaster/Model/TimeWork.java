@@ -99,4 +99,18 @@ public class TimeWork {
         }
     }
 
+    @Override
+    public String toString() {
+        return "TimeWork{" +
+                "id='" + id + '\'' +
+                ", uuid='" + uuid + '\'' +
+                ", business='" + business + '\'' +
+                ", date='" + date + '\'' +
+                ", start='" + start + '\'' +
+                ", finish='" + finish + '\'' +
+                ", note='" + note + '\'' +
+                ", total=" + total +
+                ", wage=" + wage +
+                '}';
+    }
 }
