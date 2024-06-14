@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.diev.salarymaster.Activity.Activity_Business_Management;
+import com.diev.salarymaster.Activity.Activity_Detail_TimeWork;
 import com.diev.salarymaster.Adapter.SpinnerBusinessAdapter;
 import com.diev.salarymaster.Custom.InformationAlert;
 import com.diev.salarymaster.Model.Business;
@@ -101,7 +102,7 @@ public class Fragment_Home extends Fragment {
     public static String uuid = "uuid";
     private String userId;
     private Business selectedBusiness, selectedBusiness_docx;
-    private Button btn_businessList, btn_addWorkTime, btn_filter, btn_copy;
+    private Button btn_businessList, btn_addWorkTime, btn_filter, btn_copy, btn_salary;
     private TextView tvDate, tvTimeStart, tvTimeFinish, tv_start_filter, tv_end_filter;
     private EditText edt_docx, edt_note;
     private Spinner sp_business, sp_business_docx;
@@ -139,6 +140,7 @@ public class Fragment_Home extends Fragment {
         btn_addWorkTime = view.findViewById(R.id.btn_home_addWorkTime);
         btn_filter = view.findViewById(R.id.btn_home_filter);
         btn_copy = view.findViewById(R.id.btn_home_copy);
+        btn_salary=view.findViewById(R.id.btn_home_salary);
         sp_business = view.findViewById(R.id.sp_home_business);
         sp_business_docx = view.findViewById(R.id.sp_home_business_filter);
         // Khởi tạo adapter cho Spinner
@@ -183,7 +185,13 @@ public class Fragment_Home extends Fragment {
             // Thiết lập dữ liệu cho EditText
             edt_docx.setText(formattedString);
         });
-
+        btn_salary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent= new Intent(requireContext(), Activity_Detail_TimeWork.class);
+                startActivity(intent);
+            }
+        });
         sp_business.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

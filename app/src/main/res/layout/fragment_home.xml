@@ -72,14 +72,13 @@
             android:id="@+id/edt_home_note"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:autofillHints="ghi chú"
+            android:autofillHints="@string/note"
             android:background="@drawable/selector_square"
             android:inputType="textAutoComplete"
             android:maxLines="1"
-            android:hint="ghi chú"
+            android:hint="@string/note"
             android:layout_marginBottom="10dp"
-            android:paddingHorizontal="10dp"
-            tools:ignore="HardcodedText" />
+            android:paddingHorizontal="10dp"/>
         <Button
             android:id="@+id/btn_home_addWorkTime"
             style="@style/ButtonNormal"
